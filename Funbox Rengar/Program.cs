@@ -108,17 +108,7 @@ private static void Game_OnUpdate(EventArgs args)
           if (target.IsValidTarget(350))
             {
               _e.Cast(target);
-                if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
-                  {
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                  }
-            }
-            {
               _w.Cast(target);
-                if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
-                  {
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                  }
             }
         }
       if (Player.Mana == 5)
@@ -152,13 +142,7 @@ private static void Game_OnUpdate(EventArgs args)
                         if (target.IsValidTarget(1000) && !Player.HasBuff("rengarpassivebuff") && !Player.HasBuff("rengarbushspeedbuff") && !Player.HasBuff("rengarr") && (Player.Health/Player.MaxHealth)*100 > hp)
                           _e.Cast(target);
                         if (target.IsValidTarget(350) && (Player.Health/Player.MaxHealth)*100 > hp)
-                          {
-                            _e.Cast(target);
-                              if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 1000)
-                                {
-                                  Player.IssueOrder(GameObjectOrder.AttackUnit, target);
-                                }
-                          }
+                          _e.Cast(target);
                       }
               break;
             }
