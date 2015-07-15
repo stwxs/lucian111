@@ -40,7 +40,9 @@ public class Program
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboSwitch", "Switch mode Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboMode", "Combo Mode").SetValue(new StringList(new[]{"Empowered Q", "Empowered E"})));
       _config.SubMenu("Combo").AddItem(new MenuItem("hydra", "hydra midleap").SetValue(true));
+      _config.SubMenu("Combo").AddItem(new MenuItem("melorb", "melee orbwalking").SetValue(true));
       _config.SubMenu("Combo").AddItem(new MenuItem("eq", "use E in Q mode if target out of range").SetValue(true));
+      _config.SubMenu("Combo").AddItem(new MenuItem("twotar", "2 targets selectors - search and close target").SetValue(true));
       _config.SubMenu("Combo").AddItem(new MenuItem("autoheal", "%hp autoheal").SetValue(new Slider(33, 100, 0)));
       _config.AddToMainMenu();
       Drawing.OnDraw += Drawing_OnDraw;
@@ -64,9 +66,13 @@ private static void oncast(Obj_AI_Base sender, GameObjectProcessSpellCastEventAr
 private static void Game_OnUpdate(EventArgs args)
 {
   ComboModeSwitch();
-  var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
   var hp = _config.Item("autoheal").GetValue<Slider>().Value;
   var hml = _config.Item("hydra").GetValue<bool>();
+  var mel = _config.Item("melorb").GetValue<bool>();
+  var twot = _config.Item("twotar").GetValue<bool>();
+  if (!twot)
+  {
+  var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
   if ((Player.Health/Player.MaxHealth)*100 <= hp && Player.Mana == 5)
     _w.Cast();
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -100,7 +106,7 @@ private static void Game_OnUpdate(EventArgs args)
           if (target.IsValidTarget(_q.Range))
             {
               _q.Cast(target);
-                if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                if (mel && target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
                   {
                     Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                   }
@@ -108,14 +114,14 @@ private static void Game_OnUpdate(EventArgs args)
           if (target.IsValidTarget(350))
             {
               _e.Cast(target);
-                if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                if (mel && target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
                   {
                     Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                   }
             }
             {
               _w.Cast(target);
-                if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                if (mel && target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
                   {
                     Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                   }
@@ -136,7 +142,7 @@ private static void Game_OnUpdate(EventArgs args)
                         if (target.IsValidTarget(_q.Range) && (Player.Health/Player.MaxHealth)*100 > hp)
                           {
                             _q.Cast(target);
-                              if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                              if (mel && target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
                                 {
                                   Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                                 }
@@ -154,7 +160,7 @@ private static void Game_OnUpdate(EventArgs args)
                         if (target.IsValidTarget(350) && (Player.Health/Player.MaxHealth)*100 > hp)
                           {
                             _e.Cast(target);
-                              if (target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                              if (mel && target.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
                                 {
                                   Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                                 }
@@ -163,6 +169,109 @@ private static void Game_OnUpdate(EventArgs args)
               break;
             }
         }
+    }
+    }
+if (twot)
+  {
+  var searchtarget = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
+  var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
+  if ((Player.Health/Player.MaxHealth)*100 <= hp && Player.Mana == 5)
+    _w.Cast();
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+    {
+      if (searchtarget.IsValidTarget(500))
+        {
+          Items.UseItem(3144, searchtarget);
+          Items.UseItem(3146, searchtarget);
+          Items.UseItem(3153, searchtarget);
+        }
+      if (hml && closetarget.IsValidTarget(350))
+        {
+          Items.UseItem(3074);
+          Items.UseItem(3077);
+          Items.UseItem(3143);
+        }
+      if (!hml && closetarget.IsValidTarget(200))
+        {
+          Items.UseItem(3074);
+          Items.UseItem(3077);
+          Items.UseItem(3143);
+        }
+      if (Player.Mana <= 4)
+        {
+          if (searchtarget.IsValidTarget(1000) && (Player.HasBuff("rengarpassivebuff") || Player.HasBuff("rengarbushspeedbuff") || Player.HasBuff("rengarr")))
+            _q.Cast();
+          if (searchtarget.IsValidTarget(800) && (Player.HasBuff("rengarpassivebuff") || Player.HasBuff("rengarbushspeedbuff") || Player.HasBuff("rengarr")))
+            Items.UseItem(3142);
+          if (searchtarget.IsValidTarget(1000) && !Player.HasBuff("rengarpassivebuff") && !Player.HasBuff("rengarbushspeedbuff") && !Player.HasBuff("rengarr"))
+            _e.Cast(searchtarget);
+          if (closetarget.IsValidTarget(_q.Range))
+            {
+              _q.Cast(closetarget);
+                if (mel && closetarget.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                  {
+                    Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                  }
+            }
+          if (closetarget.IsValidTarget(350))
+            {
+              _e.Cast(closetarget);
+                if (mel && closetarget.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                  {
+                    Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                  }
+            }
+            {
+              _w.Cast(closetarget);
+                if (mel && closetarget.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                  {
+                    Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                  }
+            }
+        }
+      if (Player.Mana == 5)
+        {
+          var comboMode = _config.SubMenu("Combo").Item("ComboMode").GetValue<StringList>().SelectedIndex;
+          var einq = _config.Item("eq").GetValue<bool>();
+          switch (comboMode)
+            {
+              case 0:
+                      {
+                        if (searchtarget.IsValidTarget(1000) && (Player.HasBuff("rengarpassivebuff") || Player.HasBuff("rengarbushspeedbuff") || Player.HasBuff("rengarr")) && (Player.Health/Player.MaxHealth)*100 > hp)
+                          _q.Cast();
+                        if (searchtarget.IsValidTarget(800) && (Player.HasBuff("rengarpassivebuff") || Player.HasBuff("rengarbushspeedbuff") || Player.HasBuff("rengarr")))
+                          Items.UseItem(3142);
+                        if (closetarget.IsValidTarget(_q.Range) && (Player.Health/Player.MaxHealth)*100 > hp)
+                          {
+                            _q.Cast(closetarget);
+                              if (mel && closetarget.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                                {
+                                  Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                                }
+                          }
+                        if (einq && searchtarget.Distance(Player.Position) > 250 && searchtarget.Distance(Player.Position) < 1000 && !Player.HasBuff("rengarpassivebuff") && !Player.HasBuff("rengarbushspeedbuff") && !Player.HasBuff("rengarr") && (Player.Health/Player.MaxHealth)*100 > hp)
+                          _e.Cast(searchtarget);
+                      }
+              break;
+              case 1:
+                      {
+                        if (searchtarget.IsValidTarget(800) && (Player.HasBuff("rengarpassivebuff") || Player.HasBuff("rengarbushspeedbuff") || Player.HasBuff("rengarr")))
+                          Items.UseItem(3142);
+                        if (searchtarget.IsValidTarget(1000) && !Player.HasBuff("rengarpassivebuff") && !Player.HasBuff("rengarbushspeedbuff") && !Player.HasBuff("rengarr") && (Player.Health/Player.MaxHealth)*100 > hp)
+                          _e.Cast(searchtarget);
+                        if (closetarget.IsValidTarget(350) && (Player.Health/Player.MaxHealth)*100 > hp)
+                          {
+                            _e.Cast(closetarget);
+                              if (mel && closetarget.Distance(Player) < Orbwalking.GetRealAutoAttackRange(Player) + 100)
+                                {
+                                  Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                                }
+                          }
+                      }
+              break;
+            }
+        }
+    }
     }
 }
 #endregion
