@@ -64,7 +64,7 @@ private static void oncast(Obj_AI_Base sender, GameObjectProcessSpellCastEventAr
 private static void Game_OnUpdate(EventArgs args)
 {
   ComboModeSwitch();
-  var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
+  var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
   var hp = _config.Item("autoheal").GetValue<Slider>().Value;
   var hml = _config.Item("hydra").GetValue<bool>();
   if ((Player.Health/Player.MaxHealth)*100 <= hp && Player.Mana == 5)
