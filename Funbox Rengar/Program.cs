@@ -57,7 +57,7 @@ private static void oncast(Obj_AI_Base sender, GameObjectProcessSpellCastEventAr
   return;
   if (spell.Name.ToLower().Contains("rengarq"))
     {
-      Orbwalking.ResetAutoAttackTimer();
+      xSLxOrbwalker.ResetAutoAttackTimer();
     }
 }
 #endregion
