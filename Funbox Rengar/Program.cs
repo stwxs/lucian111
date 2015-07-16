@@ -39,7 +39,7 @@ public class Program
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboSwitch", "Switch mode Key").SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboMode", "Combo Mode").SetValue(new StringList(new[]{"Empowered Q", "Empowered E"})));
       _config.SubMenu("Combo").AddItem(new MenuItem("hydra", "hydra midleap").SetValue(true));
-      _config.SubMenu("Combo").AddItem(new MenuItem("melorb", "ONESHOT").SetValue(true));
+      _config.SubMenu("Combo").AddItem(new MenuItem("melorb", "BETA oneshot. Use only if ult").SetValue(false));
       _config.SubMenu("Combo").AddItem(new MenuItem("eq", "use E in Q mode if target out of range").SetValue(true));
       _config.SubMenu("Combo").AddItem(new MenuItem("twotar", "2 targets selectors - search and close target").SetValue(true));
       _config.SubMenu("Combo").AddItem(new MenuItem("autoheal", "%hp autoheal").SetValue(new Slider(33, 100, 0)));
