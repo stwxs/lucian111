@@ -74,7 +74,6 @@ private static void Game_OnUpdate(EventArgs args)
   OrbModeSwitch();
   var hp = _config.Item("autoheal").GetValue<Slider>().Value;
   var searchtarget = TargetSelector.GetTarget(2500, TargetSelector.DamageType.Physical);
-  var searchtarget2 = TargetSelector.GetTarget(2500, TargetSelector.DamageType.Physical);
   var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
   var orbmod = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
   if (TargetSelector.GetPriority(searchtarget) == 2.5f)
@@ -85,19 +84,11 @@ private static void Game_OnUpdate(EventArgs args)
           _config.Item("ForceFocusSelected").SetValue(true);
         }
     }
-  if (TargetSelector.GetPriority(searchtarget) == 2f && !(TargetSelector.GetPriority(searchtarget) == 2.5f))
-    {
-      if (searchtarget2.IsValidTarget(2500) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
-        {
-          TargetSelector.SetTarget(searchtarget2);
-          _config.Item("ForceFocusSelected").SetValue(true);
-        }
-    }
   if (_config.Item("ForceFocusSelected").GetValue<bool>() && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
     {
       _config.Item("ForceFocusSelected").SetValue(false);
     }
-  if ((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp && ObjectManager.Player.Mana == 5)
+  if (ObjectManager.Player.Mana == 5 && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
     {
       _w.Cast();
     }
@@ -118,11 +109,16 @@ private static void Game_OnUpdate(EventArgs args)
       if (ObjectManager.Player.Mana <= 4)
         {
           if (searchtarget.IsValidTarget(1000) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
-            _q.Cast();
+            {
+              _q.Cast();
+            }
           if (searchtarget.IsValidTarget(800) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
-            Items.UseItem(3142);
+            {
+              Items.UseItem(3142);
+            }
           if (searchtarget.IsValidTarget(1000) && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
-            _e.Cast(searchtarget);
+            {
+              _e.Cast(searchtarget);
                 if (orbmod == 1)
                   {
                     if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
@@ -137,8 +133,11 @@ private static void Game_OnUpdate(EventArgs args)
                         ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                       }
                   }
+            }
           if (closetarget.IsValidTarget(_q.Range))
-            _q.Cast(closetarget);
+            {
+              _q.Cast(closetarget);
+            }
           if (closetarget.IsValidTarget(350))
             {
               _e.Cast(closetarget);
@@ -167,14 +166,26 @@ private static void Game_OnUpdate(EventArgs args)
             {
               case 0:
                       {
+                        if ((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
+                          {
+                            _w.Cast();
+                          }
                         if (searchtarget.IsValidTarget(1000) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")) && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
-                          _q.Cast();
+                          {
+                            _q.Cast();
+                          }
                         if (searchtarget.IsValidTarget(800) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
-                          Items.UseItem(3142);
+                          {
+                            Items.UseItem(3142);
+                          }
                         if (closetarget.IsValidTarget(_q.Range) && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
-                          _q.Cast(closetarget);
+                          {
+                            _q.Cast(closetarget);
+                          }
                         if (einq && searchtarget.Distance(ObjectManager.Player.Position) > 250 && searchtarget.Distance(ObjectManager.Player.Position) < 1000 && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr") && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
-                          _e.Cast(searchtarget);
+                          {
+                            _e.Cast(searchtarget);
+                          }
                         if (orbmod == 1)
                           {
                             if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
@@ -193,12 +204,22 @@ private static void Game_OnUpdate(EventArgs args)
               break;
               case 1:
                       {
+                        if ((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
+                          {
+                            _w.Cast();
+                          }
                         if (searchtarget.IsValidTarget(800) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
-                          Items.UseItem(3142);
+                          {
+                            Items.UseItem(3142);
+                          }
                         if (searchtarget.IsValidTarget(1000) && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr") && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
-                          _e.Cast(searchtarget);
+                          {
+                            _e.Cast(searchtarget);
+                          }
                         if (closetarget.IsValidTarget(350) && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
-                          _e.Cast(closetarget);
+                          {
+                            _e.Cast(closetarget);
+                          }
                         if (orbmod == 1)
                           {
                             if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
