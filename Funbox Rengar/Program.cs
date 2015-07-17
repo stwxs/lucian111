@@ -57,6 +57,10 @@ private static void oncast(Obj_AI_Base sender, GameObjectProcessSpellCastEventAr
     {
       xSLxOrbwalker.ResetAutoAttackTimer();
     }
+  if (ObjectManager.Player.HasBuff("rengarqbase") || ObjectManager.Player.HasBuff("rengarqemp"))
+    {
+      xSLxOrbwalker.ResetAutoAttackTimer();
+    }
 }
 #endregion
 #region OnGameUpdate
@@ -93,7 +97,7 @@ private static void Game_OnUpdate(EventArgs args)
             Items.UseItem(3142);
           if (target.IsValidTarget(1000) && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
             _e.Cast(target);
-          if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && target.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+          if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(target))
             {
               ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
             }
@@ -103,7 +107,7 @@ private static void Game_OnUpdate(EventArgs args)
             {
               _e.Cast(target);
               _w.Cast(target);
-                if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && target.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(target))
                   {
                     ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                   }
@@ -125,7 +129,7 @@ private static void Game_OnUpdate(EventArgs args)
                           _q.Cast(target);
                         if (einq && target.Distance(ObjectManager.Player.Position) > 250 && target.Distance(ObjectManager.Player.Position) < 1000 && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr") && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
                           _e.Cast(target);
-                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && target.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(target))
                           {
                             ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                           }
@@ -139,7 +143,7 @@ private static void Game_OnUpdate(EventArgs args)
                           _e.Cast(target);
                         if (target.IsValidTarget(350) && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
                           _e.Cast(target);
-                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && target.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(target))
                           {
                             ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                           }
@@ -177,7 +181,7 @@ if (twot)
             Items.UseItem(3142);
           if (searchtarget.IsValidTarget(1000) && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
             _e.Cast(searchtarget);
-          if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+          if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(closetarget))
             {
               ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
             }
@@ -187,7 +191,7 @@ if (twot)
             {
               _e.Cast(closetarget);
               _w.Cast(closetarget);
-                if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(closetarget))
                   {
                     ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                   }
@@ -209,7 +213,7 @@ if (twot)
                           _q.Cast(closetarget);
                         if (einq && searchtarget.Distance(ObjectManager.Player.Position) > 250 && searchtarget.Distance(ObjectManager.Player.Position) < 1000 && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr") && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
                           _e.Cast(searchtarget);
-                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(closetarget))
                           {
                             ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                           }
@@ -223,7 +227,7 @@ if (twot)
                           _e.Cast(searchtarget);
                         if (closetarget.IsValidTarget(350) && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
                           _e.Cast(closetarget);
-                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && xSLxOrbwalker.InAutoAttackRange(closetarget))
                           {
                             ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                           }
