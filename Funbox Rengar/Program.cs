@@ -70,9 +70,13 @@ private static void oncast(Obj_AI_Base sender, GameObjectProcessSpellCastEventAr
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  ComboModeSwitch();
-  OrbModeSwitch();
   var hp = _config.Item("autoheal").GetValue<Slider>().Value;
+  if ((ObjectManager.Player.Mana == 5) && ((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp))
+    {
+      _w.Cast();
+    }
+  ComboModeSwitch();
+  OrbModeSwitch();  
   var searchtarget = TargetSelector.GetTarget(2500, TargetSelector.DamageType.Physical);
   var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
   var orbmod = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
@@ -87,10 +91,6 @@ private static void Game_OnUpdate(EventArgs args)
   if (_config.Item("ForceFocusSelected").GetValue<bool>() && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
     {
       _config.Item("ForceFocusSelected").SetValue(false);
-    }
-  if (ObjectManager.Player.Mana == 5 && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
-    {
-      _w.Cast();
     }
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
