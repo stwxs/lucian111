@@ -74,6 +74,7 @@ private static void Game_OnUpdate(EventArgs args)
   OrbModeSwitch();
   var hp = _config.Item("autoheal").GetValue<Slider>().Value;
   var searchtarget = TargetSelector.GetTarget(2500, TargetSelector.DamageType.Physical);
+  var searchtarget2 = TargetSelector.GetTarget(2500, TargetSelector.DamageType.Physical);
   var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
   var orbmod = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
   if (TargetSelector.GetPriority(searchtarget) == 2.5f)
@@ -86,9 +87,9 @@ private static void Game_OnUpdate(EventArgs args)
     }
   if (TargetSelector.GetPriority(searchtarget) == 2f && !(TargetSelector.GetPriority(searchtarget) == 2.5f))
     {
-      if (searchtarget.IsValidTarget(2500) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
+      if (searchtarget2.IsValidTarget(2500) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
         {
-          TargetSelector.SetTarget(searchtarget);
+          TargetSelector.SetTarget(searchtarget2);
           _config.Item("ForceFocusSelected").SetValue(true);
         }
     }
@@ -97,7 +98,9 @@ private static void Game_OnUpdate(EventArgs args)
       _config.Item("ForceFocusSelected").SetValue(false);
     }
   if ((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp && ObjectManager.Player.Mana == 5)
-    _w.Cast();
+    {
+      _w.Cast();
+    }
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
       if (searchtarget.IsValidTarget(500))
