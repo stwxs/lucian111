@@ -36,9 +36,13 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Combo").AddItem(new MenuItem("ComboSwitch", "Switch mode Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+      _config.SubMenu("Combo").AddItem(new MenuItem("ComboSwitch", "Combo switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboMode", "Combo Mode").SetValue(new StringList(new[]{"Empowered Q", "Empowered E"})));
+      _config.SubMenu("Combo").AddItem(new MenuItem("orbswitch", "Orbwalk switch Key").SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press)));
+      _config.SubMenu("Combo").AddItem(new MenuItem("orbmode", "Orbwalking Mode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"})));
       _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("eq", "use E in Q mode if target out of range").SetValue(true));
+      _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("orbd", "draw orb mode text").SetValue(true));
+      _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("empd", "draw empowered mode text").SetValue(true));
       _config.SubMenu("Autoheal").AddItem(new MenuItem("autoheal", "%hp autoheal").SetValue(new Slider(33, 100, 0)));
       _config.AddToMainMenu();
       Drawing.OnDraw += Drawing_OnDraw;
@@ -66,9 +70,11 @@ private static void oncast(Obj_AI_Base sender, GameObjectProcessSpellCastEventAr
 private static void Game_OnUpdate(EventArgs args)
 {
   ComboModeSwitch();
+  OrbModeSwitch();
   var hp = _config.Item("autoheal").GetValue<Slider>().Value;
   var searchtarget = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
   var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
+  var orbmod = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
   if ((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp && ObjectManager.Player.Mana == 5)
     _w.Cast();
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -93,19 +99,39 @@ private static void Game_OnUpdate(EventArgs args)
             Items.UseItem(3142);
           if (searchtarget.IsValidTarget(1000) && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
             _e.Cast(searchtarget);
-          if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
-            {
-              ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
-            }
+                if (orbmod == 1)
+                  {
+                    if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                      {
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                      }
+                  }
+                if (orbmod == 2)
+                  {
+                    if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                      {
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                      }
+                  }
           if (closetarget.IsValidTarget(_q.Range))
             _q.Cast(closetarget);
           if (closetarget.IsValidTarget(350))
             {
               _e.Cast(closetarget);
               _w.Cast(closetarget);
-                if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                if (orbmod == 1)
                   {
-                    ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                    if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                      {
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                      }
+                  }
+                if (orbmod == 2)
+                  {
+                    if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                      {
+                        ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                      }
                   }
             }
         }
@@ -125,9 +151,19 @@ private static void Game_OnUpdate(EventArgs args)
                           _q.Cast(closetarget);
                         if (einq && searchtarget.Distance(ObjectManager.Player.Position) > 250 && searchtarget.Distance(ObjectManager.Player.Position) < 1000 && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr") && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
                           _e.Cast(searchtarget);
-                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                        if (orbmod == 1)
                           {
-                            ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                            if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                              {
+                                ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                              }
+                          }
+                        if (orbmod == 2)
+                          {
+                            if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                              {
+                                ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                              }
                           }
                       }
               break;
@@ -139,9 +175,19 @@ private static void Game_OnUpdate(EventArgs args)
                           _e.Cast(searchtarget);
                         if (closetarget.IsValidTarget(350) && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > hp)
                           _e.Cast(closetarget);
-                        if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                        if (orbmod == 1)
                           {
-                            ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                            if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                              {
+                                ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                              }
+                          }
+                        if (orbmod == 2)
+                          {
+                            if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
+                              {
+                                ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
+                              }
                           }
                       }
               break;
@@ -172,19 +218,66 @@ private static void ComboModeSwitch()
       }
 }
 #endregion
+#region orbswitch
+private static void OrbModeSwitch()
+{
+  var orbMode = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
+  var lasttime = Environment.TickCount - _lastTick;
+    if (!_config.SubMenu("Combo").Item("orbswitch").GetValue<KeyBind>().Active || lasttime <= Game.Ping)
+      {
+        return;
+      }
+    switch (orbMode)
+      {
+        case 0:
+          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"}, 1));
+          _lastTick = Environment.TickCount + 300;
+        break;
+        case 1:
+          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"}, 2));
+          _lastTick = Environment.TickCount + 300;
+        break;
+        case 2:
+          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"}));
+          _lastTick = Environment.TickCount + 300;
+        break;
+      }
+}
+#endregion
 #region draw
 private static void Drawing_OnDraw(EventArgs args)
 {
   var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
   var emp = _config.SubMenu("Combo").Item("ComboMode").GetValue<StringList>().SelectedIndex;
-  switch (emp)
+  var orbmode = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
+  var empd = _config.Item("empd").GetValue<bool>();
+  var orbd = _config.Item("orbd").GetValue<bool>();
+  if (empd)
     {
-      case 0:
-        Drawing.DrawText(wts[0], wts[1], Color.White, "Q");
-      break;
-      case 1:
-        Drawing.DrawText(wts[0], wts[1], Color.White, "E");
-      break;
+      switch (emp)
+        {
+          case 0:
+            Drawing.DrawText(wts[0], wts[1], Color.White, "Q");
+          break;
+          case 1:
+            Drawing.DrawText(wts[0], wts[1], Color.White, "E");
+          break;
+        }
+    }
+  if (orbd)
+    {
+      switch (orbmode)
+        {
+          case 0:
+            Drawing.DrawText(wts[0] - 70, wts[1] + 25, Color.White, "NORMAL ORBWALKING");
+          break;
+          case 1:
+            Drawing.DrawText(wts[0] - 70, wts[1] + 25, Color.White, "MIXED ORBWALKING");
+          break;
+          case 2:
+            Drawing.DrawText(wts[0] - 70, wts[1] + 25, Color.White, "ONESHOT ORBWALKING");
+          break;
+        }
     }
 }
 #endregion
