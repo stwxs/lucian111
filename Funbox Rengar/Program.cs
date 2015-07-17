@@ -41,8 +41,9 @@ public class Program
       _config.SubMenu("Combo").AddItem(new MenuItem("orbswitch", "Orbwalk switch Key").SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("orbmode", "Orbwalking Mode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"})));
       _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("eq", "use E in Q mode if target out of range").SetValue(true));
-      _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("orbd", "draw orb mode text").SetValue(true));
-      _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("empd", "draw empowered mode text").SetValue(true));
+      _config.SubMenu("Settings ON/OFF").SubMenu("Drawings").AddItem(new MenuItem("orbd", "draw orb mode text").SetValue(true));
+      _config.SubMenu("Settings ON/OFF").SubMenu("Drawings").AddItem(new MenuItem("empd", "draw empowered mode text").SetValue(true));
+      _config.SubMenu("Settings ON/OFF").SubMenu("Drawings").AddItem(new MenuItem("drawtar", "Active Enemy").SetValue(new Circle(true, Color.GreenYellow)));
       _config.SubMenu("Autoheal").AddItem(new MenuItem("autoheal", "%hp autoheal").SetValue(new Slider(33, 100, 0)));
       _config.AddToMainMenu();
       Drawing.OnDraw += Drawing_OnDraw;
@@ -252,6 +253,20 @@ private static void Drawing_OnDraw(EventArgs args)
   var orbmode = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
   var empd = _config.Item("empd").GetValue<bool>();
   var orbd = _config.Item("orbd").GetValue<bool>();
+  var drawt = _config.Item("drawtar").GetValue<Circle>();
+  var searchtarget = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
+  var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
+  if (drawt.Active)
+    {
+      if (searchtarget.IsValidTarget(1500))
+        {
+          Render.Circle.DrawCircle(searchtarget.Position, 115f, drawt.Color, 1);
+        }
+      if (closetarget.IsValidTarget(350))
+        {
+          Render.Circle.DrawCircle(closetarget.Position, 115f, drawt.Color, 1);
+        }
+    }    
   if (empd)
     {
       switch (emp)
