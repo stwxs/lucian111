@@ -29,8 +29,8 @@ public class Program
       _q = new Spell(SpellSlot.Q, 230);
       _w = new Spell(SpellSlot.W, 400);
       _e = new Spell(SpellSlot.E, 1000);
-      _e.SetSkillshot(0.3f, 75f, 1400f, true, SkillshotType.SkillshotLine);
-      _e.MinHitChance = HitChance.High;
+      _e.SetSkillshot(0.25f, 70, 1500, true, SkillshotType.SkillshotLine);
+      _e.MinHitChance = HitChance.Medium;
       _config = new Menu("Rengar", "Rengar", true);
       _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
