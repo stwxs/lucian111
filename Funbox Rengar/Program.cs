@@ -77,12 +77,12 @@ private static void Game_OnUpdate(EventArgs args)
     }
   ComboModeSwitch();
   OrbModeSwitch();  
-  var searchtarget = TargetSelector.GetTarget(2500, TargetSelector.DamageType.Physical);
+  var searchtarget = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
   var closetarget = TargetSelector.GetTarget(350, TargetSelector.DamageType.Physical);
   var orbmod = _config.SubMenu("Combo").Item("orbmode").GetValue<StringList>().SelectedIndex;
   if (TargetSelector.GetPriority(searchtarget) == 2.5f)
     {
-      if (searchtarget.IsValidTarget(2500) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
+      if (searchtarget.IsValidTarget(1500) && (ObjectManager.Player.HasBuff("rengarpassivebuff") || ObjectManager.Player.HasBuff("rengarbushspeedbuff") || ObjectManager.Player.HasBuff("rengarr")))
         {
           TargetSelector.SetTarget(searchtarget);
           _config.Item("ForceFocusSelected").SetValue(true);
