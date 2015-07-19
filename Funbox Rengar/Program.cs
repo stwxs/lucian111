@@ -39,7 +39,7 @@ public class Program
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboSwitch", "Combo switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("ComboMode", "Combo Mode").SetValue(new StringList(new[]{"Empowered Q", "Empowered E"})));
       _config.SubMenu("Combo").AddItem(new MenuItem("orbswitch", "Orbwalk switch Key").SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press)));
-      _config.SubMenu("Combo").AddItem(new MenuItem("orbmode", "Orbwalking Mode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"})));
+      _config.SubMenu("Combo").AddItem(new MenuItem("orbmode", "Orbwalking Mode").SetValue(new StringList(new[]{"MIXED ORBWALKING", "ONESHOT ORBWALKING"})));
       _config.SubMenu("Settings ON/OFF").AddItem(new MenuItem("eq", "use E in Q mode if target out of range").SetValue(true));
       _config.SubMenu("Settings ON/OFF").SubMenu("Drawings").AddItem(new MenuItem("orbd", "draw orb mode text").SetValue(true));
       _config.SubMenu("Settings ON/OFF").SubMenu("Drawings").AddItem(new MenuItem("empd", "draw empowered mode text").SetValue(true));
@@ -119,14 +119,14 @@ private static void Game_OnUpdate(EventArgs args)
           if (searchtarget.IsValidTarget(1000) && !ObjectManager.Player.HasBuff("rengarpassivebuff") && !ObjectManager.Player.HasBuff("rengarbushspeedbuff") && !ObjectManager.Player.HasBuff("rengarr"))
             {
               _e.Cast(searchtarget);
-                if (orbmod == 1)
+                if (orbmod == 0)
                   {
                     if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                       {
                         ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                       }
                   }
-                if (orbmod == 2)
+                if (orbmod == 1)
                   {
                     if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                       {
@@ -142,14 +142,14 @@ private static void Game_OnUpdate(EventArgs args)
             {
               _e.Cast(closetarget);
               _w.Cast(closetarget);
-                if (orbmod == 1)
+                if (orbmod == 0)
                   {
                     if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                       {
                         ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                       }
                   }
-                if (orbmod == 2)
+                if (orbmod == 1)
                   {
                     if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                       {
@@ -186,14 +186,14 @@ private static void Game_OnUpdate(EventArgs args)
                           {
                             _e.Cast(searchtarget);
                           }
-                        if (orbmod == 1)
+                        if (orbmod == 0)
                           {
                             if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                               {
                                 ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                               }
                           }
-                        if (orbmod == 2)
+                        if (orbmod == 1)
                           {
                             if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                               {
@@ -220,14 +220,14 @@ private static void Game_OnUpdate(EventArgs args)
                           {
                             _e.Cast(closetarget);
                           }
-                        if (orbmod == 1)
+                        if (orbmod == 0)
                           {
                             if ((_q.IsReady() || _w.IsReady() || _e.IsReady()) && closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                               {
                                 ObjectManager.Player.IssueOrder(GameObjectOrder.AttackUnit, closetarget);
                               }
                           }
-                        if (orbmod == 2)
+                        if (orbmod == 1)
                           {
                             if (closetarget.Distance(ObjectManager.Player) < Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 100)
                               {
@@ -275,15 +275,11 @@ private static void OrbModeSwitch()
     switch (orbMode)
       {
         case 0:
-          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"}, 1));
+          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"MIXED ORBWALKING", "ONESHOT ORBWALKING"}, 1));
           _lastTick = Environment.TickCount + 300;
         break;
         case 1:
-          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"}, 2));
-          _lastTick = Environment.TickCount + 300;
-        break;
-        case 2:
-          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"NORMAL ORBWALKING", "MIXED ORBWALKING", "ONESHOT ORBWALKING"}));
+          _config.SubMenu("Combo").Item("orbmode").SetValue(new StringList(new[]{"MIXED ORBWALKING", "ONESHOT ORBWALKING"}));
           _lastTick = Environment.TickCount + 300;
         break;
       }
@@ -328,12 +324,9 @@ private static void Drawing_OnDraw(EventArgs args)
       switch (orbmode)
         {
           case 0:
-            Drawing.DrawText(wts[0] - 70, wts[1] + 25, Color.White, "NORMAL ORBWALKING");
-          break;
-          case 1:
             Drawing.DrawText(wts[0] - 70, wts[1] + 25, Color.White, "MIXED ORBWALKING");
           break;
-          case 2:
+          case 1:
             Drawing.DrawText(wts[0] - 70, wts[1] + 25, Color.White, "ONESHOT ORBWALKING");
           break;
         }
