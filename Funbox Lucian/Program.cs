@@ -27,13 +27,15 @@ public class Program
       _w = new Spell(SpellSlot.W, 1000);
       _w.SetSkillshot(0.25f, 70, 1500, true, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
-      _e = new Spell(SpellSlot.E);
+      _e = new Spell(SpellSlot.E, 475);
       _config = new Menu("Lucian", "Lucian", true);
       _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.AddItem(new MenuItem("res", "RESET AA").SetValue(true));
+      _config.AddItem(new MenuItem("q", "Q").SetValue(true));
+      _config.AddItem(new MenuItem("w", "W").SetValue(true));
+      _config.AddItem(new MenuItem("e", "E").SetValue(true));
       _config.AddToMainMenu();
       Game.OnUpdate += Game_OnUpdate;
     }
@@ -41,14 +43,16 @@ public class Program
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var reset = _config.Item("res").GetValue<bool>();
-  var target = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
+  var ec = _config.Item("e").GetValue<bool>();
+  var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
+      if (ec && target.IsValidTarget(1000))
+        _e.Cast(Game.CursorPos);
       if (!_e.IsReady())
         {
           Utility.DelayAction.Add(600, CastQ);
-          Utility.DelayAction.Add(1200, CastW);
+          Utility.DelayAction.Add(1500, CastW);
         }
     }
 }
@@ -56,27 +60,24 @@ private static void Game_OnUpdate(EventArgs args)
 #region Q
 private static void CastQ()
 {
-  var reset = _config.Item("res").GetValue<bool>();
-  var target = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
-  if (_q.IsReady())
+  var qc = _config.Item("q").GetValue<bool>();
+  var qtarget = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
+  if (qc && _q.IsReady())
     {
-      _q.CastOnUnit(target);
-        if (reset)
-          {
-            Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
-          }
+      _q.CastOnUnit(qtarget);
+      Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
     }
 }
 #endregion
 #region W
 private static void CastW()
 {
-  var reset = _config.Item("res").GetValue<bool>();
-  var target = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
-  if (_w.IsReady())
+  var wc = _config.Item("w").GetValue<bool>();
+  var wtarget = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
+  if (wc && _w.IsReady())
     {
-      _w.Cast(target);
-        if (reset && _w.Cast(target) == Spell.CastStates.SuccessfullyCasted)
+      _w.Cast(wtarget);
+        if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
           {
             Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
           }
