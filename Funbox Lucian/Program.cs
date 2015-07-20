@@ -44,15 +44,18 @@ public class Program
 private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var target = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
+  var target = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      if (ec && target.IsValidTarget(1000))
+      if (ec && target.IsValidTarget(900))
         _e.Cast(Game.CursorPos);
       if (!_e.IsReady())
         {
           Utility.DelayAction.Add(600, CastQ);
-          Utility.DelayAction.Add(1500, CastW);
+          if (!_q.IsReady())
+            {
+              Utility.DelayAction.Add(1500, CastW);
+            }
         }
     }
 }
@@ -73,7 +76,7 @@ private static void CastQ()
 private static void CastW()
 {
   var wc = _config.Item("w").GetValue<bool>();
-  var wtarget = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
+  var wtarget = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Physical);
   if (wc && _w.IsReady())
     {
       _w.Cast(wtarget);
