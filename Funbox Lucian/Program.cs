@@ -48,7 +48,7 @@ private static void Game_OnUpdate(EventArgs args)
       if (!_e.IsReady())
         {
           Utility.DelayAction.Add(600, CastQ);
-          Utility.DelayAction.Add(2000, CastW);
+          Utility.DelayAction.Add(1200, CastW);
         }
     }
 }
