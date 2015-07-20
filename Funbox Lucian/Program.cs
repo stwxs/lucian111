@@ -48,7 +48,7 @@ private static void Game_OnUpdate(EventArgs args)
       if (!_e.IsReady())
         {
           Utility.DelayAction.Add(600, CastQ);
-          Utility.DelayAction.Add(1500, CastW);
+          Utility.DelayAction.Add(2000, CastW);
         }
     }
 }
@@ -63,7 +63,7 @@ private static void CastQ()
       _q.CastOnUnit(target);
         if (reset)
           {
-            Orbwalking.ResetAutoAttackTimer();
+            Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
           }
     }
 }
@@ -78,7 +78,7 @@ private static void CastW()
       _w.Cast(target);
         if (reset && _w.Cast(target) == Spell.CastStates.SuccessfullyCasted)
           {
-            Orbwalking.ResetAutoAttackTimer();
+            Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
           }
     }
 }
