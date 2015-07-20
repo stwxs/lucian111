@@ -42,13 +42,13 @@ public class Program
 private static void Game_OnUpdate(EventArgs args)
 {
   var reset = _config.Item("res").GetValue<bool>();
-  var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Physical);
+  var target = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
       if (!_e.IsReady())
         {
-          Utility.DelayAction.Add(1000, CastQ);
-          Utility.DelayAction.Add(2000, CastW);
+          Utility.DelayAction.Add(600, CastQ);
+          Utility.DelayAction.Add(1500, CastW);
         }
     }
 }
@@ -57,13 +57,13 @@ private static void Game_OnUpdate(EventArgs args)
 private static void CastQ()
 {
   var reset = _config.Item("res").GetValue<bool>();
-  var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Physical);
+  var target = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
   if (_q.IsReady())
     {
       _q.CastOnUnit(target);
         if (reset)
           {
-            Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
+            Orbwalking.ResetAutoAttackTimer();
           }
     }
 }
@@ -72,13 +72,13 @@ private static void CastQ()
 private static void CastW()
 {
   var reset = _config.Item("res").GetValue<bool>();
-  var target = TargetSelector.GetTarget(1050, TargetSelector.DamageType.Physical);
+  var target = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
   if (_w.IsReady())
     {
       _w.Cast(target);
         if (reset && _w.Cast(target) == Spell.CastStates.SuccessfullyCasted)
           {
-            Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
+            Orbwalking.ResetAutoAttackTimer();
           }
     }
 }
