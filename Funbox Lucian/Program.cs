@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using LeagueSharp;
 using LeagueSharp.Common;
 namespace Lucian
@@ -12,7 +11,6 @@ public class Program
   private static Spell _q;
   private static Spell _w;
   private static Spell _e;
-  private static int _lastTick;
 #endregion
 #region Main
   private static void Main(string[] args)
@@ -35,58 +33,53 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Combo").AddItem(new MenuItem("ComboSwitch", "Combo switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-      _config.SubMenu("Combo").AddItem(new MenuItem("ComboMode", "Combo Mode").SetValue(new StringList(new[]{"EQW - aggresive", "QWE - safe"})));
-      _config.SubMenu("Combo").AddItem(new MenuItem("dcom", "draw combo mode").SetValue(true));
-      _config.SubMenu("Combo").SubMenu("spells usage").AddItem(new MenuItem("e", "E in EQW MODE").SetValue(true));
-      _config.SubMenu("Combo").SubMenu("spells usage").AddItem(new MenuItem("e2", "E in QWE MODE").SetValue(true));
-      _config.SubMenu("E in QWE MODE settings").AddItem(new MenuItem("safee", "%hp to use safe E").SetValue(new Slider(25, 100, 0)));
-      _config.SubMenu("E in QWE MODE settings").AddItem(new MenuItem("meleran", "distance to closest target").SetValue(new Slider(400, 700, 100)));
+      _config.AddItem(new MenuItem("e", "use E in combo").SetValue(true));
+      _config.AddItem(new MenuItem("e2", "E-safe mode").SetValue(true));
       _config.AddToMainMenu();
-      Drawing.OnDraw += Drawing_OnDraw;
       Game.OnUpdate += Game_OnUpdate;
     }
 #endregion
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var comod = _config.SubMenu("Combo").Item("ComboMode").GetValue<StringList>().SelectedIndex;
-  var ec = _config.SubMenu("Combo").SubMenu("spells usage").Item("e").GetValue<bool>();
-  var eec = _config.SubMenu("Combo").SubMenu("spells usage").Item("e2").GetValue<bool>();
-  var hp = _config.SubMenu("E in QWE MODE settings").Item("safee").GetValue<Slider>().Value;
-  var ran = _config.SubMenu("E in QWE MODE settings").Item("meleran").GetValue<Slider>().Value;
-  var meleetarget = TargetSelector.GetTarget(ran, TargetSelector.DamageType.Physical);
+  var ec = _config.Item("e").GetValue<bool>();
+  var ecs = _config.Item("e2").GetValue<bool>();
+  var meleetarget = TargetSelector.GetTarget(400, TargetSelector.DamageType.Physical);
   var target = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      if (comod == 0)
+      if (_e.IsReady())
         {
-          if (ec && target.IsValidTarget(900))
-            _e.Cast(Game.CursorPos);
-          if (!_e.IsReady())
-            {
-              Utility.DelayAction.Add(600, CastQ);
-              if (!_q.IsReady())
-                {
-                  Utility.DelayAction.Add(1500, CastW);
-                }
-            }
-        }
-      if (comod == 1)
-        {
-          if (target.IsValidTarget(700))
-            {
-              CastQ();
-            }
+          CastQ();
           if (!_q.IsReady())
             {
               Utility.DelayAction.Add(600, CastW);
             }
-          if (eec && meleetarget.Distance(ObjectManager.Player.Position) < ran && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
-            _e.Cast(Game.CursorPos);
+        }
+      else
+        {
+          Utility.DelayAction.Add(600, CastQ);
+          if (!_q.IsReady())
+            {
+              Utility.DelayAction.Add(1500, CastW);
+            }
+        }
+      if (ec)
+        {
+          if (!ecs)
+            {
+              if (target.IsValidTarget(900))
+                {
+                  _e.Cast(Game.CursorPos);
+                }
+            }
+          else
+            {
+              if (meleetarget.Distance(ObjectManager.Player.Position) < 400 && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= 25)
+                _e.Cast(Game.CursorPos);
+            }
         }
     }
-  Switch();
 }
 #endregion
 #region Q
@@ -111,48 +104,6 @@ private static void CastW()
           {
             Utility.DelayAction.Add(300, Orbwalking.ResetAutoAttackTimer);
           }
-    }
-}
-#endregion
-#region key
-private static void Switch()
-{
-  var empp = _config.SubMenu("Combo").Item("ComboMode").GetValue<StringList>().SelectedIndex;
-  var lasttime = Environment.TickCount - _lastTick;
-    if (!_config.SubMenu("Combo").Item("ComboSwitch").GetValue<KeyBind>().Active || lasttime <= Game.Ping)
-      {
-        return;
-      }
-    switch (empp)
-      {
-        case 0:
-          _config.SubMenu("Combo").Item("ComboMode").SetValue(new StringList(new[]{"EQW - aggresive", "QWE - safe"}, 1));
-          _lastTick = Environment.TickCount + 300;
-        break;
-        case 1:
-          _config.SubMenu("Combo").Item("ComboMode").SetValue(new StringList(new[]{"EQW - aggresive", "QWE - safe"}));
-          _lastTick = Environment.TickCount + 300;
-        break;
-      }
-}
-#endregion
-#region draw
-private static void Drawing_OnDraw(EventArgs args)
-{
-  var dc = _config.SubMenu("Combo").Item("dcom").GetValue<bool>();
-  var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
-  var emp = _config.SubMenu("Combo").Item("ComboMode").GetValue<StringList>().SelectedIndex;
-  if (dc)
-    {
-      switch (emp)
-        {
-          case 0:
-            Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "EQW - aggresive");
-          break;
-          case 1:
-            Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "QWE - safe");
-          break;
-        }
     }
 }
 #endregion
