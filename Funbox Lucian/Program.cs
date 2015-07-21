@@ -105,7 +105,7 @@ private static void CastQ()
 private static void CastW()
 {
   var dell = _config.Item("delay2").GetValue<Slider>().Value;
-  var wtarget = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
+  var wtarget = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_w.IsReady())
     {
       _w.Cast(wtarget);
