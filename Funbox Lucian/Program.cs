@@ -34,57 +34,62 @@ public class Program
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
-      _config.AddItem(new MenuItem("e2", "E safe mode").SetValue(true));
-      _config.AddItem(new MenuItem("diste", "E safe mode - distance to closest enemy").SetValue(new Slider(400, 700, 0)));
-      _config.AddItem(new MenuItem("hptoe", "E safe mode - %hp").SetValue(new Slider(25, 100, 0)));
-      _config.AddItem(new MenuItem("delay", "Delay before spell").SetValue(new Slider(430, 1000, 0)));
-      _config.AddItem(new MenuItem("delay2", "Delay after spell").SetValue(new Slider(350, 1000, 0)));
+      _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(400, 500, 350)));
       _config.AddToMainMenu();
+      Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Game.OnUpdate += Game_OnUpdate;
     }
+#endregion
+#region after attack
+private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
+{
+  var ec = _config.Item("e").GetValue<bool>();
+  var meleetarget = TargetSelector.GetTarget(400, TargetSelector.DamageType.Physical);
+  var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
+  if (unit.IsMe)
+    {
+      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+        {
+          if (ec)
+            {
+              if (_e.IsReady())
+                {
+                  _e.Cast(Game.CursorPos);
+                }
+              else if (_q.IsReady())
+                {
+                  CastQ();
+                }
+              else if (_w.IsReady())
+                {
+                  CastW();
+                }
+            }
+          else
+            {
+              if (_q.IsReady())
+                {
+                  CastQ();
+                }
+              else if (_w.IsReady())
+                {
+                  CastW();
+                }
+            }
+        }
+    }
+}
 #endregion
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var ecs = _config.Item("e2").GetValue<bool>();
-  var dis = _config.Item("diste").GetValue<Slider>().Value;
-  var hp = _config.Item("hptoe").GetValue<Slider>().Value;
-  var del = _config.Item("delay").GetValue<Slider>().Value;
-  var meleetarget = TargetSelector.GetTarget(400, TargetSelector.DamageType.Physical);
-  var target = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
+  var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      if (_e.IsReady())
+      if (ec && targett.Distance(ObjectManager.Player.Position) > 700)
         {
-          CastQ();
-          if (!_q.IsReady())
-            {
-              Utility.DelayAction.Add(del, CastW);
-            }
-        }
-      else
-        {
-          Utility.DelayAction.Add(del, CastQ);
-          if (!_q.IsReady())
-            {
-              Utility.DelayAction.Add(del*2, CastW);
-            }
-        }
-      if (ec)
-        {
-          if (!ecs)
-            {
-              if (target.IsValidTarget(900))
-                {
-                  _e.Cast(Game.CursorPos);
-                }
-            }
-          else
-            {
-              if (meleetarget.Distance(ObjectManager.Player.Position) < dis && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
-                _e.Cast(Game.CursorPos);
-            }
+          _e.Cast(Game.CursorPos);
         }
     }
 }
@@ -94,11 +99,8 @@ private static void CastQ()
 {
   var dell = _config.Item("delay2").GetValue<Slider>().Value;
   var qtarget = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
-  if (_q.IsReady())
-    {
-      _q.CastOnUnit(qtarget);
-      Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
-    }
+  _q.CastOnUnit(qtarget);
+  Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
 #region W
@@ -106,14 +108,11 @@ private static void CastW()
 {
   var dell = _config.Item("delay2").GetValue<Slider>().Value;
   var wtarget = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
-  if (_w.IsReady())
-    {
-      _w.Cast(wtarget);
-        if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
-          {
-            Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
-          }
-    }
+  _w.Cast(wtarget);
+    if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
+      {
+        Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
+      }
 }
 #endregion
 }
