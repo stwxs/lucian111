@@ -9,6 +9,7 @@ public class Program
   private static Menu _config;
   private static Orbwalking.Orbwalker _orbwalker;
   private static Spell _q;
+  private static Spell _q2;
   private static Spell _w;
   private static Spell _e;
 #endregion
@@ -24,6 +25,9 @@ public class Program
       if (ObjectManager.Player.ChampionName != "Lucian")
         return;
       _q = new Spell(SpellSlot.Q, 700);
+      _q2 = new Spell(SpellSlot.Q, 1100);
+      _q2.SetSkillshot(0.25f, 40, 3000, false, SkillshotType.SkillshotLine);
+      _q2.MinHitChance = HitChance.VeryHigh;
       _w = new Spell(SpellSlot.W, 1000);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
@@ -33,6 +37,7 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
+      _config.AddItem(new MenuItem("q", "Q Extended").SetValue(true));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
       _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(450, 500, 400)));
       _config.AddToMainMenu();
@@ -87,6 +92,20 @@ private static void Game_OnUpdate(EventArgs args)
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
+      var ex = _config.Item("q").GetValue<bool>();
+      var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
+      var collisions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q2.Range, MinionTypes.All, MinionTeam.NotAlly);
+      if (ex && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+        {
+          foreach (var minion in collisions)
+            {
+              var p = new Geometry.Polygon.Rectangle(ObjectManager.Player.ServerPosition, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), _q2.Width);
+                if (p.IsInside(targetqe))
+                  {
+                    _q2.CastOnUnit(minion);
+                  }
+            }
+        }
       if (_q.IsReady())
         {
           CastQ();
