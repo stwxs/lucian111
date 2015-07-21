@@ -89,13 +89,13 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
+  var ex = _config.Item("q").GetValue<bool>();
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
+  var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
+  var collisions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q2.Range, MinionTypes.All, MinionTeam.NotAlly);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      var ex = _config.Item("q").GetValue<bool>();
-      var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
-      var collisions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q2.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if (ex && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if (ex && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in collisions)
             {
@@ -116,6 +116,17 @@ private static void Game_OnUpdate(EventArgs args)
       if (ec && targett.Distance(ObjectManager.Player.Position) > 700)
         {
           _e.Cast(Game.CursorPos);
+        }
+      if (ex && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+        {
+          foreach (var minion in collisions)
+            {
+              var p = new Geometry.Polygon.Rectangle(ObjectManager.Player.ServerPosition, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), _q2.Width);
+                if (p.IsInside(targetqe))
+                  {
+                    _q2.CastOnUnit(minion);
+                  }
+            }
         }
     }
 }
