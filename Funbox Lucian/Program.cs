@@ -37,8 +37,8 @@ public class Program
       _config.AddItem(new MenuItem("e2", "E safe mode").SetValue(true));
       _config.AddItem(new MenuItem("diste", "E safe mode - distance to closest enemy").SetValue(new Slider(400, 700, 0)));
       _config.AddItem(new MenuItem("hptoe", "E safe mode - %hp").SetValue(new Slider(25, 100, 0)));
-      _config.AddItem(new MenuItem("delay", "Delay before spell").SetValue(new Slider(600, 1000, 0)));
-      _config.AddItem(new MenuItem("delay2", "Delay after spell").SetValue(new Slider(300, 1000, 0)));
+      _config.AddItem(new MenuItem("delay", "Delay before spell").SetValue(new Slider(430, 1000, 0)));
+      _config.AddItem(new MenuItem("delay2", "Delay after spell").SetValue(new Slider(350, 1000, 0)));
       _config.AddToMainMenu();
       Game.OnUpdate += Game_OnUpdate;
     }
@@ -105,7 +105,7 @@ private static void CastQ()
 private static void CastW()
 {
   var dell = _config.Item("delay2").GetValue<Slider>().Value;
-  var wtarget = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Physical);
+  var wtarget = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
   if (_w.IsReady())
     {
       _w.Cast(wtarget);
