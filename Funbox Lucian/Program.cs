@@ -35,6 +35,8 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
       _config.AddItem(new MenuItem("e2", "E safe mode").SetValue(true));
+      _config.AddItem(new MenuItem("diste", "E safe mode - distance to closest enemy").SetValue(new Slider(400, 700, 0)));
+      _config.AddItem(new MenuItem("hptoe", "E safe mode - %hp").SetValue(new Slider(25, 100, 0)));
       _config.AddItem(new MenuItem("delay", "Delay before spell").SetValue(new Slider(600, 1000, 0)));
       _config.AddItem(new MenuItem("delay2", "Delay after spell").SetValue(new Slider(300, 1000, 0)));
       _config.AddToMainMenu();
@@ -46,6 +48,8 @@ private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
   var ecs = _config.Item("e2").GetValue<bool>();
+  var dis = _config.Item("diste").GetValue<Slider>().Value;
+  var hp = _config.Item("hptoe").GetValue<Slider>().Value;
   var del = _config.Item("delay").GetValue<Slider>().Value;
   var meleetarget = TargetSelector.GetTarget(400, TargetSelector.DamageType.Physical);
   var target = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
@@ -78,7 +82,7 @@ private static void Game_OnUpdate(EventArgs args)
             }
           else
             {
-              if (meleetarget.Distance(ObjectManager.Player.Position) < 400 && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= 25)
+              if (meleetarget.Distance(ObjectManager.Player.Position) < dis && (ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 <= hp)
                 _e.Cast(Game.CursorPos);
             }
         }
