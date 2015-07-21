@@ -39,6 +39,7 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       _config.AddItem(new MenuItem("q", "Q Extended").SetValue(true));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
+      _config.AddItem(new MenuItem("e2", "E to target").SetValue(true));
       _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(450, 500, 400)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
@@ -89,6 +90,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
+  var ecc = _config.Item("e2").GetValue<bool>();
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
@@ -113,7 +115,7 @@ private static void Game_OnUpdate(EventArgs args)
     }
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      if (ec && targett.Distance(ObjectManager.Player.Position) > 700)
+      if (ecc && ec && targett.Distance(ObjectManager.Player.Position) > 700)
         {
           _e.Cast(Game.CursorPos);
         }
