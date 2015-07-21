@@ -48,6 +48,13 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (unit.IsMe)
     {
+      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+        {
+          if (_q.IsReady())
+            {
+              CastQ();
+            }
+        }
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
         {
           if (ec)
