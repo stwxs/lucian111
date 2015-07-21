@@ -39,7 +39,7 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       _config.AddItem(new MenuItem("q", "Q Extended").SetValue(true));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
-      _config.AddItem(new MenuItem("e2", "E to target").SetValue(false));
+      _config.AddItem(new MenuItem("e2", "E to target").SetValue(true));
       _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(450, 500, 400)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
