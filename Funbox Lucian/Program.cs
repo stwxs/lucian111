@@ -50,7 +50,6 @@ public class Program
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (unit.IsMe)
     {
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -89,7 +88,6 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
       var mna = _config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value;
