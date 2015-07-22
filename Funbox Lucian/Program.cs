@@ -24,7 +24,7 @@ public class Program
     {
       if (ObjectManager.Player.ChampionName != "Lucian")
         return;
-      _q = new Spell(SpellSlot.Q, 700);
+      _q = new Spell(SpellSlot.Q, 675);
       _q2 = new Spell(SpellSlot.Q, 1100);
       _q2.SetSkillshot(0.25f, 40, 3000, false, SkillshotType.SkillshotLine);
       _w = new Spell(SpellSlot.W, 1000);
@@ -36,7 +36,8 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.AddItem(new MenuItem("q", "Q Extended").SetValue(true));
+      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q", "Q Extended").SetValue(true));
+      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"Medium", "High", "VeryHigh", "Dashing", "Immobile"})));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
       _config.AddItem(new MenuItem("e2", "E if enemy out of attack range").SetValue(false));
       _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(450, 500, 400)));
@@ -93,18 +94,49 @@ private static void Game_OnUpdate(EventArgs args)
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      var ex = _config.Item("q").GetValue<bool>();
+      var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
+      var ex2 = _config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex;
       var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
-      var collisions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q2.Range, MinionTypes.All, MinionTeam.NotAlly);
+      var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if (ex && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
-          foreach (var minion in collisions)
+          foreach (var minion in minions)
             {
-              var p = new Geometry.Polygon.Rectangle(ObjectManager.Player.ServerPosition, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), _q2.Width);
-                if (p.IsInside(targetqe))
-                  {
-                    _q2.CastOnUnit(minion);
-                  }
+              if (ex2 == 0)
+                {
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Medium))
+                    {
+                      _q2.CastOnUnit(minion, true);
+                    }
+                }
+              if (ex2 == 1)
+                {
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.High))
+                    {
+                      _q2.CastOnUnit(minion, true);
+                    }
+                }
+              if (ex2 == 2)
+                {
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
+                    {
+                      _q2.CastOnUnit(minion, true);
+                    }
+                }
+              if (ex2 == 3)
+                {
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Dashing))
+                    {
+                      _q2.CastOnUnit(minion, true);
+                    }
+                }
+              if (ex2 == 4)
+                {
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Immobile))
+                    {
+                      _q2.CastOnUnit(minion, true);
+                    }
+                }
             }
         }
       if (_q.IsReady())
@@ -125,7 +157,7 @@ private static void Game_OnUpdate(EventArgs args)
 private static void CastQ()
 {
   var dell = _config.Item("delay2").GetValue<Slider>().Value;
-  var qtarget = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
+  var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   _q.CastOnUnit(qtarget);
   Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
 }
