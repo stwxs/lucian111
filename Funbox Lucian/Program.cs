@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 namespace Lucian
@@ -12,6 +13,7 @@ public class Program
   private static Spell _q2;
   private static Spell _w;
   private static Spell _e;
+  private static string[] select = {"Ashe", "Caitlyn", "Corki", "Draven", "Ezreal", "Graves", "Jinx", "Kalista", "KogMaw", "Lucian", "MissFortune","Quinn","Sivir","Teemo","Tristana","TwistedFate","Twitch","Urgot","Varus","Vayne"};
 #endregion
 #region Main
   private static void Main(string[] args)
@@ -36,6 +38,11 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
+      _config.SubMenu("Q Extended Settings").SubMenu("select champions").AddItem(new MenuItem("nhgfr", "use Q Extended on:"));
+      foreach (var hero in HeroManager.Enemies)
+        {
+          _config.SubMenu("Q Extended Settings").SubMenu("select champions").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
+        }
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q", "Q Extended").SetValue(true));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("mana", "%mana").SetValue(new Slider(40, 100, 0)));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"VeryHigh", "Dashing", "Immobile"})));
@@ -93,7 +100,7 @@ private static void Game_OnUpdate(EventArgs args)
     {
       var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
       var ex2 = _config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex;
-      var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if (ex && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna) && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
