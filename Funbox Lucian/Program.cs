@@ -26,7 +26,7 @@ public class Program
         return;
       _q = new Spell(SpellSlot.Q, 625);
       _q2 = new Spell(SpellSlot.Q, 1200);
-      _w = new Spell(SpellSlot.W, 1000);
+      _w = new Spell(SpellSlot.W, 625);
       _q.SetTargetted(0.25f, float.MaxValue);
       _q2.SetSkillshot(0.55f, 75f, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
@@ -154,7 +154,7 @@ private static void CastQ()
 private static void CastW()
 {
   var dell = _config.Item("delay2").GetValue<Slider>().Value;
-  var wtarget = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
+  var wtarget = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
   _w.Cast(wtarget);
     if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
       {
