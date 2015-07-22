@@ -106,14 +106,18 @@ private static void Game_OnUpdate(EventArgs args)
       var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
       var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
       var collisions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q2.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if (ex && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      foreach (var enemy in HeroManager.Enemies)
         {
-          foreach (var minion in collisions)
+          var sel = _config.SubMenu("Q Extended Settings").Item(enemy.ChampionName).GetValue<bool>();
+          if (ex && sel && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
             {
-              var p = new Geometry.Polygon.Rectangle(ObjectManager.Player.ServerPosition, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), _q2.Width);
-              if (p.IsInside(targetqe))
+              foreach (var minion in collisions)
                 {
-                  _q2.CastOnUnit(minion);
+                  var p = new Geometry.Polygon.Rectangle(ObjectManager.Player.ServerPosition, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), _q2.Width);
+                  if (p.IsInside(targetqe))
+                    {
+                      _q2.CastOnUnit(minion);
+                    }
                 }
             }
         }
