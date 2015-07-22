@@ -24,8 +24,8 @@ public class Program
     {
       if (ObjectManager.Player.ChampionName != "Lucian")
         return;
-      _q = new Spell(SpellSlot.Q, 500);
-      _q2 = new Spell(SpellSlot.Q, 1100);
+      _q = new Spell(SpellSlot.Q, 600);
+      _q2 = new Spell(SpellSlot.Q, 1200);
       _w = new Spell(SpellSlot.W, 1000);
       _q.SetTargetted(0.25f, float.MaxValue);
       _q2.SetSkillshot(0.55f, 75f, float.MaxValue, false, SkillshotType.SkillshotLine);
@@ -69,7 +69,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(350, CastW);
+                  Utility.DelayAction.Add(200, CastW);
                 }
             }
           else
@@ -80,7 +80,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(350, CastW);
+                  Utility.DelayAction.Add(200, CastW);
                 }
             }
         }
