@@ -26,8 +26,9 @@ public class Program
         return;
       _q = new Spell(SpellSlot.Q, 500);
       _q2 = new Spell(SpellSlot.Q, 1100);
-      _q2.SetSkillshot(0.25f, 40, 3000, false, SkillshotType.SkillshotLine);
       _w = new Spell(SpellSlot.W, 1000);
+      _q.SetTargetted(0.25f, float.MaxValue);
+      _q2.SetSkillshot(0.55f, 75f, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
       _e = new Spell(SpellSlot.E, 475);
