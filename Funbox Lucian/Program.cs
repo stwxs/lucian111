@@ -37,6 +37,7 @@ public class Program
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q", "Q Extended").SetValue(true));
+      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("mana", "%mana").SetValue(new Slider(40, 100, 0)));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"Medium", "High", "VeryHigh", "Dashing", "Immobile"})));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
       _config.AddItem(new MenuItem("e2", "E if enemy out of attack range").SetValue(false));
@@ -94,11 +95,12 @@ private static void Game_OnUpdate(EventArgs args)
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
+      var mna = _config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value;
       var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
       var ex2 = _config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex;
       var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if (ex && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if (ex && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 <= mna && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
             {
