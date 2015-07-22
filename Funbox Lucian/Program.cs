@@ -40,7 +40,7 @@ public class Program
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("mana", "%mana").SetValue(new Slider(40, 100, 0)));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"VeryHigh", "Dashing", "Immobile"})));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(350, 375, 325)));
+      _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(350, 375, 325)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Game.OnUpdate += Game_OnUpdate;
