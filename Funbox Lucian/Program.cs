@@ -24,7 +24,7 @@ public class Program
     {
       if (ObjectManager.Player.ChampionName != "Lucian")
         return;
-      _q = new Spell(SpellSlot.Q, 600);
+      _q = new Spell(SpellSlot.Q, 625);
       _q2 = new Spell(SpellSlot.Q, 1200);
       _w = new Spell(SpellSlot.W, 1000);
       _q.SetTargetted(0.25f, float.MaxValue);
