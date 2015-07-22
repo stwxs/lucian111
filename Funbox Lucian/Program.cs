@@ -40,8 +40,7 @@ public class Program
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q", "Q Extended").SetValue(true));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("mana", "%mana").SetValue(new Slider(40, 100, 0)));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"VeryHigh", "Dashing", "Immobile"})));
-      _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
-      _config.AddItem(new MenuItem("e2", "E if enemy out of attack range").SetValue(false));
+      _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(375, 400, 350)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
@@ -91,7 +90,6 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 private static void Game_OnUpdate(EventArgs args)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var ecc = _config.Item("e2").GetValue<bool>();
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
@@ -130,13 +128,6 @@ private static void Game_OnUpdate(EventArgs args)
       if (_q.IsReady())
         {
           CastQ();
-        }
-    }
-  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
-    {
-      if (ecc && ec && targett.Distance(ObjectManager.Player.Position) > 700)
-        {
-          _e.Cast(Game.CursorPos);
         }
     }
 }
