@@ -24,7 +24,7 @@ public class Program
     {
       if (ObjectManager.Player.ChampionName != "Lucian")
         return;
-      _q = new Spell(SpellSlot.Q, 675);
+      _q = new Spell(SpellSlot.Q, 500);
       _q2 = new Spell(SpellSlot.Q, 1100);
       _q2.SetSkillshot(0.25f, 40, 3000, false, SkillshotType.SkillshotLine);
       _w = new Spell(SpellSlot.W, 1000);
@@ -51,7 +51,6 @@ public class Program
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var meleetarget = TargetSelector.GetTarget(400, TargetSelector.DamageType.Physical);
   var targett = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
   if (unit.IsMe)
     {
@@ -100,7 +99,7 @@ private static void Game_OnUpdate(EventArgs args)
       var ex2 = _config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex;
       var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if (ex && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 <= mna && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if (ex && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna && _q2.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
             {
