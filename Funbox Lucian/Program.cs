@@ -26,7 +26,7 @@ public class Program
         return;
       _q = new Spell(SpellSlot.Q, 675);
       _q2 = new Spell(SpellSlot.Q, 1200);
-      _w = new Spell(SpellSlot.W, 675);
+      _w = new Spell(SpellSlot.W, 1000);
       _q2.SetSkillshot(0.55f, 75f, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
@@ -87,15 +87,15 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
+  var mna = _config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value;
   var ec = _config.Item("e").GetValue<bool>();
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      var mna = _config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value;
       var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
       var ex2 = _config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex;
       var targetqe = TargetSelector.GetTarget(_q2.Range, TargetSelector.DamageType.Physical);
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if (ex && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if (ex && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna) && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
             {
