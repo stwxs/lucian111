@@ -107,21 +107,21 @@ private static void Game_OnUpdate(EventArgs args)
                 {
                   if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
                     {
-                      _q2.CastOnUnit(minion, true);
+                      _q2.CastOnUnit(minion);
                     }
                 }
               if (ex2 == 1)
                 {
                   if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Dashing))
                     {
-                      _q2.CastOnUnit(minion, true);
+                      _q2.CastOnUnit(minion);
                     }
                 }
               if (ex2 == 2)
                 {
                   if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Immobile))
                     {
-                      _q2.CastOnUnit(minion, true);
+                      _q2.CastOnUnit(minion);
                     }
                 }
             }
