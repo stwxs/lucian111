@@ -66,7 +66,8 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(200, CastW);
+                  CastW();
+                  //Utility.DelayAction.Add(200, CastW);
                 }
             }
           else
@@ -77,7 +78,8 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(200, CastW);
+                  CastW();
+                  //Utility.DelayAction.Add(200, CastW);
                 }
             }
         }
