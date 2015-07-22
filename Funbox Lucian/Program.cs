@@ -38,7 +38,7 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q", "Q Extended").SetValue(true));
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("mana", "%mana").SetValue(new Slider(40, 100, 0)));
-      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"Medium", "High", "VeryHigh"})));
+      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q2", "Hitchance").SetValue(new StringList(new[]{"VeryHigh", "Dashing", "Immobile"})));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(true));
       _config.AddItem(new MenuItem("e2", "E if enemy out of attack range").SetValue(false));
       _config.AddItem(new MenuItem("delay2", "aa reset delay after Q, W").SetValue(new Slider(450, 500, 400)));
@@ -105,21 +105,21 @@ private static void Game_OnUpdate(EventArgs args)
             {
               if (ex2 == 0)
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Medium))
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
                     {
                       _q2.CastOnUnit(minion, true);
                     }
                 }
               if (ex2 == 1)
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.High))
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Dashing))
                     {
                       _q2.CastOnUnit(minion, true);
                     }
                 }
               if (ex2 == 2)
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
+                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Immobile))
                     {
                       _q2.CastOnUnit(minion, true);
                     }
