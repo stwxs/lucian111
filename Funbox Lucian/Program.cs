@@ -118,7 +118,8 @@ private static void Game_OnUpdate(EventArgs args)
                       var p = new Geometry.Polygon.Rectangle(ObjectManager.Player.ServerPosition, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), _q2.Width);
                       if (p.IsInside(targetqe))
                         {
-                          _q2.CastOnUnit(minion);
+                          _q2.CastIfHitchanceEquals(minion, HitChance.VeryHigh, true);
+                          //_q2.CastOnUnit(minion);
                         }
                     }
                 }
