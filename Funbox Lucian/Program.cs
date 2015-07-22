@@ -27,7 +27,7 @@ public class Program
       _q = new Spell(SpellSlot.Q, 700);
       _q2 = new Spell(SpellSlot.Q, 1100);
       _q2.SetSkillshot(0.25f, 40, 3000, false, SkillshotType.SkillshotLine);
-      _q2.MinHitChance = HitChance.VeryHigh;
+      _q2.MinHitChance = HitChance.Immobile;
       _w = new Spell(SpellSlot.W, 1000);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
