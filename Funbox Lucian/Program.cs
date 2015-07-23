@@ -39,14 +39,15 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
-      _config.SubMenu("Draw").AddItem(new MenuItem("ed", "E").SetValue(true));
-      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("autoqe" , "Auto Q Extended").SetValue(false));
+      _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
+      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("autoq1" , "Auto normal Q - target in autoattack range").SetValue(false));
+      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("autoqe" , "Auto Q Extended").SetValue(false));
       foreach (var hero in HeroManager.Enemies)
         {
-          _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
+          _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
-      _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
+      _config.SubMenu("Draw").AddItem(new MenuItem("ed", "E").SetValue(true));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Drawing.OnDraw += OnDraw;
@@ -95,6 +96,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 private static void Game_OnUpdate(EventArgs args)
 {
   var autoq = _config.Item("autoqe").GetValue<bool>();
+  var autoq2 = _config.Item("autoq1").GetValue<bool>();
   if (autoq && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
@@ -110,7 +112,7 @@ private static void Game_OnUpdate(EventArgs args)
                 }
             }
         }
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
+      if (autoq2 && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
         {
           _q.CastOnUnit(t);
         }
