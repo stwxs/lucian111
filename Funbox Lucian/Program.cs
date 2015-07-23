@@ -39,6 +39,7 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
+      _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaa", "Q before attack").SetValue(false));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("qn" , "normal Q - target in autoattack range").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("aqn" , "Auto normal Q - target in autoattack range").SetValue(false));
@@ -63,6 +64,7 @@ public class Program
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
   var ec = _config.Item("e").GetValue<bool>();
+  var qbef = _config.Item("qcaa").GetValue<bool>();
   if (unit.IsMe)
     {
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -75,7 +77,10 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_q.IsReady())
                 {
-                  Utility.DelayAction.Add(250, CastQ);
+                  if (!qbef)
+                    {
+                      Utility.DelayAction.Add(250, CastQ);
+                    }
                 }
               else if (_w.IsReady())
                 {
@@ -86,7 +91,10 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
             {
               if (_q.IsReady())
                 {
-                  CastQ();
+                  if (!qbef)
+                    {
+                      CastQ();
+                    }
                 }
               else if (_w.IsReady())
                 {
@@ -100,11 +108,16 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
+  var qbef = _config.Item("qcaa").GetValue<bool>();
   var qex = _config.Item("qe").GetValue<bool>();
   var aqex = _config.Item("aqe").GetValue<bool>();
   var qexc = _config.Item("qec").GetValue<bool>();
   var autoqnor = _config.Item("aqn").GetValue<bool>();
   var qnor = _config.Item("qn").GetValue<bool>();
+  if (qbef)
+    {
+      CastQ();
+    }
   if (qex && aqex && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       var manahh = _config.Item("manah").GetValue<Slider>().Value;
