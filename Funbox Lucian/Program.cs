@@ -13,6 +13,7 @@ public class Program
   private static Spell _q2;
   private static Spell _w;
   private static Spell _e;
+  private static string[] select = {"Ashe", "Caitlyn", "Corki", "Draven", "Ezreal", "Graves", "Jinx", "Kalista", "KogMaw", "Lucian", "MissFortune","Quinn","Sivir","Teemo","Tristana","TwistedFate","Twitch","Urgot","Varus","Vayne"};
 #endregion
 #region Main
   private static void Main(string[] args)
@@ -39,7 +40,7 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       foreach (var hero in HeroManager.Enemies)
         {
-          _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName));
+          _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(350, 375, 325)));
