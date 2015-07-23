@@ -40,13 +40,13 @@ public class Program
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("autoq1" , "Auto normal Q - target in autoattack range").SetValue(false));
+      _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("autoq1" , "Auto normal Q - target in autoattack range").SetValue(false));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("autoqe" , "Auto Q Extended").SetValue(false));
       foreach (var hero in HeroManager.Enemies)
         {
           _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
+      _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
       _config.SubMenu("Draw").AddItem(new MenuItem("qd", "Q").SetValue(true));
       _config.AddToMainMenu();
@@ -101,7 +101,6 @@ private static void Game_OnUpdate(EventArgs args)
   if (autoq && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       var manahh = _config.Item("manah").GetValue<Slider>().Value;
-      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
@@ -114,10 +113,15 @@ private static void Game_OnUpdate(EventArgs args)
                 }
             }
         }
-      if (autoq2 && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
-        {
-          _q.CastOnUnit(t);
-        }
+    }
+  if (autoq2 && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+    {
+      var manahh = _config.Item("manah").GetValue<Slider>().Value;
+      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+        if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
+          {
+            _q.CastOnUnit(t);
+          }
     }
   if (!autoq && _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
