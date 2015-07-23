@@ -42,9 +42,9 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Combo").AddItem(new MenuItem("qc", "Use Q").SetValue(false));
-      _config.SubMenu("Combo").AddItem(new MenuItem("wc", "Use W").SetValue(false));
-      _config.SubMenu("Combo").AddItem(new MenuItem("ec", "Use E").SetValue(false));
+      _config.SubMenu("Combo").AddItem(new MenuItem("qc", "Use Q").SetValue(true));
+      _config.SubMenu("Combo").AddItem(new MenuItem("wc", "Use W").SetValue(true));
+      _config.SubMenu("Combo").AddItem(new MenuItem("ec", "Use E").SetValue(true));
       _config.SubMenu("Harras").SubMenu("Q Extended Settings").SubMenu("select champions").AddItem(new MenuItem("nhgfr", "use Q Extended on:"));
       foreach (var hero in HeroManager.Enemies)
         {
