@@ -40,6 +40,7 @@ public class Program
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
       _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaa", "Q before attack").SetValue(false));
+      _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaaa", "Q after attack E off").SetValue(false));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
       //_config.SubMenu("Killsteal").AddItem(new MenuItem("qec" , "Q Extended").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("qn" , "normal Q - target in autoattack range").SetValue(true));
@@ -65,6 +66,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 {
   var ec = _config.Item("e").GetValue<bool>();
   var qbef = _config.Item("qcaa").GetValue<bool>();
+  var qaft = _config.Item("qcaaa").GetValue<bool>();
   if (unit.IsMe)
     {
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -91,7 +93,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
             {
               if (_q.IsReady())
                 {
-                  if (!qbef)
+                  if (qaft)
                     {
                       CastQ();
                     }
@@ -191,6 +193,7 @@ private static void Game_OnUpdate(EventArgs args)
   SwitchOptionSEX();
   SwitchOptionsnq();
   SwitchOptionseqc();
+  SwitchOptionsdas();
 }
 #endregion
 #region Q
@@ -271,6 +274,16 @@ private static void SwitchOptionseqc()
     if (_config.Item("e").GetValue<bool>())
       {
         _config.Item("qcaa").SetValue(false);
+      }
+  }
+#endregion
+#region switchoptionsdas
+private static void SwitchOptionsdas()
+  {
+    if (_config.Item("qcaaa").GetValue<bool>())
+      {
+        _config.Item("qcaa").SetValue(false);
+        _config.Item("e").SetValue(false);
       }
   }
 #endregion
