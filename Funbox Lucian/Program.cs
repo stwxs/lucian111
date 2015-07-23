@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Drawing;
 using LeagueSharp;
 using LeagueSharp.Common;
 namespace Lucian
@@ -29,15 +30,18 @@ public class Program
       _q = new Spell(SpellSlot.Q, 675);
       _q2 = new Spell(SpellSlot.Q, 1200);
       _w = new Spell(SpellSlot.W, 1000);
+      _e = new Spell(SpellSlot.E, 475);
       _q2.SetSkillshot(0.55f, 75f, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
-      _e = new Spell(SpellSlot.E, 475);
       _config = new Menu("Lucian", "Lucian", true);
       _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
+      _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
+      _config.SubMenu("Draw").AddItem(new MenuItem("ed", "E").SetValue(true));
+      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("autoqe" , "Auto Q Extended").SetValue(false));
       foreach (var hero in HeroManager.Enemies)
         {
           _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
@@ -45,6 +49,7 @@ public class Program
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
+      Drawing.OnDraw += OnDraw;
       Game.OnUpdate += Game_OnUpdate;
     }
 #endregion
@@ -89,7 +94,28 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+  var autoq = _config.Item("autoqe").GetValue<bool>();
+  if (autoq && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+    {
+      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
+      var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+        {
+          foreach (var minion in minions)
+            {
+              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
+                {
+                  _q2.CastOnUnit(minion);
+                }
+            }
+        }
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
+        {
+          _q.CastOnUnit(t);
+        }
+    }
+  if (!autoq && _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
       var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
@@ -128,6 +154,29 @@ private static void CastW()
       {
         Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
       }
+}
+#endregion
+#region draw
+private static void OnDraw(EventArgs args)
+{
+  var qd = _config.SubMenu("Draw").Item("qed").GetValue<bool>();
+  var ed = _config.SubMenu("Draw").Item("ed").GetValue<bool>();
+  if (ed)
+    {
+      Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, Color.DarkRed, 5);
+    }
+  if (qd)
+    {
+      var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
+      if (targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
+        {
+          foreach (var minion in minions)
+            {
+              Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, Color.DarkBlue, 10);
+            }
+        }
+    }
 }
 #endregion
 }
