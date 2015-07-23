@@ -105,7 +105,10 @@ private static void Game_OnUpdate(EventArgs args)
         }
       if (_q.IsReady())
         {
-          CastQ();
+          if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
+            {
+              CastQ();
+            }
         }
     }
 }
