@@ -64,15 +64,11 @@ public class Program
 #region after attack
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
-  var ec = _config.Item("e").GetValue<bool>();
-  var mna2 = _config.SubMenu("Harras").Item("mana2").GetValue<Slider>().Value;
-  var wh = _config.SubMenu("Harras").Item("wh").GetValue<bool>();
-  var eh = _config.SubMenu("Harras").Item("eh").GetValue<bool>();
   if (unit.IsMe)
     {
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
         {
-          if (ec)
+          if (_config.Item("e").GetValue<bool>())
             {
               if (_e.IsReady())
                 {
@@ -101,16 +97,15 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
         }
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
         {
-          var w2target = TargetSelector.GetTarget(_w2.Range, TargetSelector.DamageType.Physical);
-          if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna2)
+          if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > (_config.SubMenu("Harras").Item("mana2").GetValue<Slider>().Value))
             {
-              if (eh && _e.IsReady())
+              if ((_config.SubMenu("Harras").Item("eh").GetValue<bool>()) && _e.IsReady())
                 {
                   _e.Cast(Game.CursorPos);
                 }
-              else if (wh && _w2.IsReady())
+              else if ((_config.SubMenu("Harras").Item("wh").GetValue<bool>()) && _w2.IsReady())
                 {
-                  _w2.Cast(w2target);
+                  _w2.Cast(TargetSelector.GetTarget(_w2.Range, TargetSelector.DamageType.Physical));
                 }
             }
         }
@@ -120,19 +115,11 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var mna = _config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value;
-  var mna2 = _config.SubMenu("Harras").Item("mana2").GetValue<Slider>().Value;
-  var qh = _config.SubMenu("Harras").Item("qh").GetValue<bool>();
-  var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
-  var ex2 = _config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex;
-  var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>());
-  var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-  var ec = _config.Item("e").GetValue<bool>();
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna2)
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > (_config.SubMenu("Harras").Item("mana2").GetValue<Slider>().Value))
         {
-          if (qh && _q.IsReady())
+          if ((_config.SubMenu("Harras").Item("qh").GetValue<bool>()) && _q.IsReady())
             {
               CastQ();
             }
@@ -140,27 +127,27 @@ private static void Game_OnUpdate(EventArgs args)
     }
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      if (ex && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna) && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if ((_config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>()) && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > (_config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value)) && _q.IsReady() && (HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>())).Distance(ObjectManager.Player.Position) > _q.Range && (HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>())).CountEnemiesInRange(_q2.Range) > 0)
         {
-          foreach (var minion in minions)
+          foreach (var minion in MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly))
             {
-              if (ex2 == 0)
+              if ((_config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex) == 0)
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
+                  if (_q2.WillHit((HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>())), ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
                     {
                       _q2.CastOnUnit(minion);
                     }
                 }
-              if (ex2 == 1)
+              if ((_config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex) == 1)
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Dashing))
+                  if (_q2.WillHit((HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>())), ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Dashing))
                     {
                       _q2.CastOnUnit(minion);
                     }
                 }
-              if (ex2 == 2)
+              if ((_config.SubMenu("Q Extended Settings").Item("q2").GetValue<StringList>().SelectedIndex) == 2)
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Immobile))
+                  if (_q2.WillHit((HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>())), ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.Immobile))
                     {
                       _q2.CastOnUnit(minion);
                     }
@@ -173,21 +160,17 @@ private static void Game_OnUpdate(EventArgs args)
 #region Q
 private static void CastQ()
 {
-  var dell = _config.Item("delay2").GetValue<Slider>().Value;
-  var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-  _q.CastOnUnit(qtarget);
-  Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
+  _q.CastOnUnit(TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical));
+  Utility.DelayAction.Add((_config.Item("delay2").GetValue<Slider>().Value), Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
 #region W
 private static void CastW()
 {
-  var dell = _config.Item("delay2").GetValue<Slider>().Value;
-  var wtarget = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
-  _w.Cast(wtarget);
-    if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
+  _w.Cast(TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical));
+    if (_w.Cast(TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical)) == Spell.CastStates.SuccessfullyCasted)
       {
-        Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
+        Utility.DelayAction.Add((_config.Item("delay2").GetValue<Slider>().Value), Orbwalking.ResetAutoAttackTimer);
       }
 }
 #endregion
