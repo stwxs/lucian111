@@ -130,7 +130,7 @@ private static void Game_OnUpdate(EventArgs args)
     }
   if (!aqex && qex)
     {
-      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
         {
           var manahh = _config.Item("manah").GetValue<Slider>().Value;
           var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
