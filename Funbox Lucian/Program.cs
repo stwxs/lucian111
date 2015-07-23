@@ -188,7 +188,7 @@ private static void Game_OnUpdate(EventArgs args)
           _q.CastOnUnit(t);
         }
     }
-  SwitchOptionsex();
+  SwitchOptionSEX();
   SwitchOptionsnq();
   SwitchOptionseqc();
 }
@@ -247,8 +247,8 @@ private static void OnDraw(EventArgs args)
     }
 }
 #endregion
-#region switchoptionsex
-private static void SwitchOptionsex()
+#region switchoptionSEX
+private static void SwitchOptionSEX()
   {
     if (!(_config.Item("qe").GetValue<bool>()))
       {
