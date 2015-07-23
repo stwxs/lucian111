@@ -81,12 +81,12 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 {
                   if (!qbef)
                     {
-                      Utility.DelayAction.Add(250, CastQ);
+                      Utility.DelayAction.Add(60, CastQ);
                     }
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(250, CastW);
+                  Utility.DelayAction.Add(60, CastW);
                 }
             }
           else
@@ -100,7 +100,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(250, CastW);
+                  Utility.DelayAction.Add(60, CastW);
                 }
             }
         }
@@ -200,7 +200,7 @@ private static void CastQ()
 {
   var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   _q.CastOnUnit(qtarget);
-  Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
+  Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
 #region Qbef
@@ -210,7 +210,7 @@ private static void CastQbef()
   _q.Cast(qtarget);
     if (_q.Cast(qtarget) == Spell.CastStates.SuccessfullyCasted)
       {
-        Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
+        Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
       }
 }
 #endregion
@@ -221,7 +221,7 @@ private static void CastW()
   _w.Cast(wtarget);
     if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
       {
-        Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
+        Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
       }
 }
 #endregion
