@@ -41,10 +41,10 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaa", "Q before attack").SetValue(false));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
+      _config.SubMenu("Killsteal").AddItem(new MenuItem("qec" , "Q Extended").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("qn" , "normal Q - target in autoattack range").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("aqn" , "Auto normal Q - target in autoattack range").SetValue(false));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qe" , "Q Extended").SetValue(true));
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qec" , "Q Extended in combo mode").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("aqe" , "Auto Q Extended").SetValue(false));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("info1", "ON:"));
       foreach (var hero in HeroManager.Enemies)
@@ -114,9 +114,9 @@ private static void Game_OnUpdate(EventArgs args)
   var qexc = _config.Item("qec").GetValue<bool>();
   var autoqnor = _config.Item("aqn").GetValue<bool>();
   var qnor = _config.Item("qn").GetValue<bool>();
-  if (qbef)
+  if (qbef && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
-      CastQ();
+      CastQbef();
     }
   if (qex && aqex && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
@@ -190,6 +190,7 @@ private static void Game_OnUpdate(EventArgs args)
     }
   SwitchOptionsex();
   SwitchOptionsnq();
+  SwitchOptionseqc();
 }
 #endregion
 #region Q
@@ -198,6 +199,17 @@ private static void CastQ()
   var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   _q.CastOnUnit(qtarget);
   Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
+}
+#endregion
+#region Qbef
+private static void CastQbef()
+{
+  var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+  _q.Cast(qtarget);
+    if (_q.Cast(qtarget) == Spell.CastStates.SuccessfullyCasted)
+      {
+        Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
+      }
 }
 #endregion
 #region W
@@ -240,7 +252,6 @@ private static void SwitchOptionsex()
   {
     if (!(_config.Item("qe").GetValue<bool>()))
       {
-        _config.Item("qec").SetValue(false);
         _config.Item("aqe").SetValue(false);
       }
   }
@@ -251,6 +262,15 @@ private static void SwitchOptionsnq()
     if (!(_config.Item("qn").GetValue<bool>()))
       {
         _config.Item("aqn").SetValue(false);
+      }
+  }
+#endregion
+#region switchoptionseqc
+private static void SwitchOptionseqc()
+  {
+    if (_config.Item("e").GetValue<bool>())
+      {
+        _config.Item("qcaa").SetValue(false);
       }
   }
 #endregion
