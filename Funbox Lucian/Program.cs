@@ -162,7 +162,7 @@ private static void Game_OnUpdate(EventArgs args)
 private static void CastQ()
 {
   _q.CastOnUnit(TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical));
-  Utility.DelayAction.Add(350, Orbwalking.ResetAutoAttackTimer);
+  Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
 #region W
@@ -171,7 +171,7 @@ private static void CastW()
   _w.Cast(TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical));
     if (_w.Cast(TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical)) == Spell.CastStates.SuccessfullyCasted)
       {
-        Utility.DelayAction.Add(350, Orbwalking.ResetAutoAttackTimer);
+        Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
       }
 }
 #endregion
