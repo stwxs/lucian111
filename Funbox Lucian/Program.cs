@@ -99,7 +99,7 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
             }
         }
-      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
         {
           var w2target = TargetSelector.GetTarget(_w2.Range, TargetSelector.DamageType.Physical);
           if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna2)
@@ -128,7 +128,7 @@ private static void Game_OnUpdate(EventArgs args)
   var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>());
   var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
   var ec = _config.Item("e").GetValue<bool>();
-  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna2)
         {
@@ -137,6 +137,9 @@ private static void Game_OnUpdate(EventArgs args)
               CastQ();
             }
         }
+    }
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+    {
       if (ex && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna) && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
