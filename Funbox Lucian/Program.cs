@@ -41,15 +41,15 @@ public class Program
       _config.AddSubMenu(targetSelectorMenu);
       _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaa", "Q before attack").SetValue(false));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.SubMenu("Killsteal").AddItem(new MenuItem("qec" , "Q Extended").SetValue(true));
+      //_config.SubMenu("Killsteal").AddItem(new MenuItem("qec" , "Q Extended").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("qn" , "normal Q - target in autoattack range").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("aqn" , "Auto normal Q - target in autoattack range").SetValue(false));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qe" , "Q Extended").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("aqe" , "Auto Q Extended").SetValue(false));
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("info1", "ON:"));
+      _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
       foreach (var hero in HeroManager.Enemies)
         {
-          _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
+          _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
@@ -111,7 +111,7 @@ private static void Game_OnUpdate(EventArgs args)
   var qbef = _config.Item("qcaa").GetValue<bool>();
   var qex = _config.Item("qe").GetValue<bool>();
   var aqex = _config.Item("aqe").GetValue<bool>();
-  var qexc = _config.Item("qec").GetValue<bool>();
+  //var qexc = _config.Item("qec").GetValue<bool>();
   var autoqnor = _config.Item("aqn").GetValue<bool>();
   var qnor = _config.Item("qn").GetValue<bool>();
   if (qbef && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
@@ -134,7 +134,7 @@ private static void Game_OnUpdate(EventArgs args)
             }
         }
     }
-  if (qex && qexc && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+  /*if (qex && qexc && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       var manahh = _config.Item("manah").GetValue<Slider>().Value;
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
@@ -149,7 +149,7 @@ private static void Game_OnUpdate(EventArgs args)
                 }
             }
         }
-    }
+    }*/
   if (qnor && autoqnor && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       var manahh = _config.Item("manah").GetValue<Slider>().Value;
