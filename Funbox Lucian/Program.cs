@@ -91,6 +91,7 @@ private static void Game_OnUpdate(EventArgs args)
 {
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
+      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
@@ -103,12 +104,9 @@ private static void Game_OnUpdate(EventArgs args)
                 }
             }
         }
-      if (_q.IsReady())
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
         {
-          if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
-            {
-              CastQ();
-            }
+          _q.CastOnUnit(t);
         }
     }
 }
