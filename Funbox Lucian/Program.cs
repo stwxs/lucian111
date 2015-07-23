@@ -37,7 +37,6 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Q Extended Settings").SubMenu("select champions").AddItem(new MenuItem("nhgfr", "use Q Extended on:"));
       foreach (var hero in HeroManager.Enemies)
         {
           _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName));
@@ -93,7 +92,7 @@ private static void Game_OnUpdate(EventArgs args)
   var ec = _config.Item("e").GetValue<bool>();
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>());
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
