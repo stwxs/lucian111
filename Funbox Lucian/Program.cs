@@ -48,7 +48,7 @@ public class Program
         }
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
-      _config.SubMenu("Draw").AddItem(new MenuItem("ed", "E").SetValue(true));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qd", "Q").SetValue(true));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Drawing.OnDraw += OnDraw;
@@ -164,13 +164,13 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
-  var qd = _config.Item("qed").GetValue<bool>();
-  var ed = _config.Item("ed").GetValue<bool>();
-  if (ed)
-    {
-      Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, Color.DarkRed, 5);
-    }
+  var qde = _config.Item("qed").GetValue<bool>();
+  var qd = _config.Item("qd").GetValue<bool>();
   if (qd)
+    {
+      Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, Color.DarkRed, 5);
+    }
+  if (qde)
     {
       var manahh = _config.Item("manah").GetValue<Slider>().Value;
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
