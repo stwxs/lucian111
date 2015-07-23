@@ -55,7 +55,6 @@ public class Program
       _config.SubMenu("Harras").AddItem(new MenuItem("wh", "use W").SetValue(true));
       _config.SubMenu("Harras").AddItem(new MenuItem("eh", "use E").SetValue(false));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(350, 375, 325)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Game.OnUpdate += Game_OnUpdate;
@@ -161,7 +160,7 @@ private static void Game_OnUpdate(EventArgs args)
 private static void CastQ()
 {
   _q.CastOnUnit(TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical));
-  Utility.DelayAction.Add((_config.Item("delay2").GetValue<Slider>().Value), Orbwalking.ResetAutoAttackTimer);
+  Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
 #region W
@@ -170,7 +169,7 @@ private static void CastW()
   _w.Cast(TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical));
     if (_w.Cast(TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical)) == Spell.CastStates.SuccessfullyCasted)
       {
-        Utility.DelayAction.Add((_config.Item("delay2").GetValue<Slider>().Value), Orbwalking.ResetAutoAttackTimer);
+        Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
       }
 }
 #endregion
