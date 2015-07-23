@@ -44,6 +44,7 @@ public class Program
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("aqn" , "Auto normal Q - target in autoattack range").SetValue(false));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qe" , "Q Extended").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("aqe" , "Auto Q Extended").SetValue(false));
+      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("info1", "ON:"));
       foreach (var hero in HeroManager.Enemies)
         {
           _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
