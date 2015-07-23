@@ -43,7 +43,7 @@ public class Program
           _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(375, 400, 350)));
+      _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(400, 425, 375)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Game.OnUpdate += Game_OnUpdate;
