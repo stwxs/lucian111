@@ -50,7 +50,7 @@ public class Program
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qd", "Q").SetValue(true));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qd", "Q normal").SetValue(true));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Drawing.OnDraw += OnDraw;
