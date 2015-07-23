@@ -46,6 +46,7 @@ public class Program
         {
           _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
+      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
       _config.SubMenu("Draw").AddItem(new MenuItem("ed", "E").SetValue(true));
       _config.AddToMainMenu();
@@ -99,10 +100,11 @@ private static void Game_OnUpdate(EventArgs args)
   var autoq2 = _config.Item("autoq1").GetValue<bool>();
   if (autoq && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
+      var manahh = _config.Item("manah").GetValue<Slider>().Value;
       var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
             {
@@ -112,17 +114,18 @@ private static void Game_OnUpdate(EventArgs args)
                 }
             }
         }
-      if (autoq2 && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
+      if (autoq2 && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
         {
           _q.CastOnUnit(t);
         }
     }
   if (!autoq && _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
+      var manahh = _config.Item("manah").GetValue<Slider>().Value;
       var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
             {
@@ -132,7 +135,7 @@ private static void Game_OnUpdate(EventArgs args)
                 }
             }
         }
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40)
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
         {
           _q.CastOnUnit(t);
         }
@@ -169,9 +172,10 @@ private static void OnDraw(EventArgs args)
     }
   if (qd)
     {
+      var manahh = _config.Item("manah").GetValue<Slider>().Value;
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-      if (targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
         {
           foreach (var minion in minions)
             {
