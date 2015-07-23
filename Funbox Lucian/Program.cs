@@ -13,7 +13,6 @@ public class Program
   private static Spell _q2;
   private static Spell _w;
   private static Spell _e;
-  private static string[] select = {"Ashe", "Caitlyn", "Corki", "Draven", "Ezreal", "Graves", "Jinx", "Kalista", "KogMaw", "Lucian", "MissFortune","Quinn","Sivir","Teemo","Tristana","TwistedFate","Twitch","Urgot","Varus","Vayne"};
 #endregion
 #region Main
   private static void Main(string[] args)
@@ -41,10 +40,9 @@ public class Program
       _config.SubMenu("Q Extended Settings").SubMenu("select champions").AddItem(new MenuItem("nhgfr", "use Q Extended on:"));
       foreach (var hero in HeroManager.Enemies)
         {
-          _config.SubMenu("Q Extended Settings").SubMenu("select champions").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
+          _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName));
         }
       _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("q", "Q Extended").SetValue(true));
-      _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("mana", "%mana").SetValue(new Slider(40, 100, 0)));
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(350, 375, 325)));
       _config.AddToMainMenu();
@@ -93,14 +91,13 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var mna = _config.SubMenu("Q Extended Settings").Item("mana").GetValue<Slider>().Value;
   var ec = _config.Item("e").GetValue<bool>();
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
       var ex = _config.SubMenu("Q Extended Settings").Item("q").GetValue<bool>();
       var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").SubMenu("select champions").Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if (ex && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > mna) && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+      if (ex && ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40) && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
             {
