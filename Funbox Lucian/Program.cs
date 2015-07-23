@@ -97,8 +97,8 @@ private static void Game_OnUpdate(EventArgs args)
   var autoq = _config.Item("autoqe").GetValue<bool>();
   if (autoq && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
-      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
+      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
@@ -117,8 +117,8 @@ private static void Game_OnUpdate(EventArgs args)
     }
   if (!autoq && _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
     {
-      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
+      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > 40 && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
@@ -159,8 +159,8 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
-  var qd = _config.SubMenu("Draw").Item("qed").GetValue<bool>();
-  var ed = _config.SubMenu("Draw").Item("ed").GetValue<bool>();
+  var qd = _config.Item("qed").GetValue<bool>();
+  var ed = _config.Item("ed").GetValue<bool>();
   if (ed)
     {
       Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, Color.DarkRed, 5);
@@ -168,7 +168,7 @@ private static void OnDraw(EventArgs args)
   if (qd)
     {
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.SubMenu("Q Extended Settings").Item("auto" + hero.ChampionName).GetValue<bool>());
+      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       if (targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
         {
           foreach (var minion in minions)
