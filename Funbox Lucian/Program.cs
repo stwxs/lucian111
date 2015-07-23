@@ -43,7 +43,6 @@ public class Program
           _config.SubMenu("Q Extended Settings").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.AddItem(new MenuItem("delay2", "reset aa").SetValue(new Slider(400, 425, 375)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Game.OnUpdate += Game_OnUpdate;
@@ -115,21 +114,19 @@ private static void Game_OnUpdate(EventArgs args)
 #region Q
 private static void CastQ()
 {
-  var dell = _config.Item("delay2").GetValue<Slider>().Value;
   var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   _q.CastOnUnit(qtarget);
-  Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
+  Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
 #region W
 private static void CastW()
 {
-  var dell = _config.Item("delay2").GetValue<Slider>().Value;
   var wtarget = TargetSelector.GetTarget(_w.Range, TargetSelector.DamageType.Physical);
   _w.Cast(wtarget);
     if (_w.Cast(wtarget) == Spell.CastStates.SuccessfullyCasted)
       {
-        Utility.DelayAction.Add(dell, Orbwalking.ResetAutoAttackTimer);
+        Utility.DelayAction.Add(400, Orbwalking.ResetAutoAttackTimer);
       }
 }
 #endregion
