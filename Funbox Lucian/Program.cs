@@ -14,6 +14,7 @@ public class Program
   private static Spell _q2;
   private static Spell _w;
   private static Spell _e;
+  private static Spell _r;
   private static string[] select = {"Ashe", "Caitlyn", "Corki", "Draven", "Ezreal", "Graves", "Jinx", "Kalista", "KogMaw", "Lucian", "MissFortune","Quinn","Sivir","Teemo","Tristana","TwistedFate","Twitch","Urgot","Varus","Vayne"};
 #endregion
 #region Main
@@ -31,6 +32,7 @@ public class Program
       _q2 = new Spell(SpellSlot.Q, 1200);
       _w = new Spell(SpellSlot.W, 1000);
       _e = new Spell(SpellSlot.E, 475);
+      _r = new Spell(SpellSlot.R, 1400);
       _q2.SetSkillshot(0.55f, 50f, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
@@ -53,11 +55,20 @@ public class Program
           _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qndt", "Q normal thickness").SetValue(new Slider(5, 30, 0)));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qedl", "Q Extended draw logic").SetValue(false));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qedt", "Q Extended thickness").SetValue(new Slider(10, 30, 0)));
+      _config.SubMenu("Draw").AddItem(new MenuItem("srdy", "if spells ready to use").SetValue(false));
+      _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qnd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qndt", "thickness").SetValue(new Slider(10, 20, 0)));
+      _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qed", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedl", "draw logic").SetValue(false));
+      _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedt", "thickness").SetValue(new Slider(10, 20, 0)));
+      _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wdt", "thickness").SetValue(new Slider(10, 20, 0)));
+      _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("ed", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("edt", "thickness").SetValue(new Slider(10, 20, 0)));
+      _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("ead", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("eadt", "thickness").SetValue(new Slider(10, 20, 0)));
+      _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rdt", "thickness").SetValue(new Slider(10, 20, 0)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Drawing.OnDraw += OnDraw;
@@ -231,19 +242,87 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
+  var srdy = _config.Item("srdy").GetValue<bool>();
   {
     var qndt = _config.Item("qndt").GetValue<Slider>().Value;
     var qnd = _config.Item("qnd").GetValue<Circle>();
-    if (qnd.Active)
+    if (qnd.Active && !srdy)
       {
         Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color, qndt);
+      }
+    else if (qnd.Active && srdy)
+      {
+        if (_q.IsReady())
+          {
+            Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color, qndt);
+          }
+      }
+  }
+  {
+    var wdt = _config.Item("wdt").GetValue<Slider>().Value;
+    var wd = _config.Item("wd").GetValue<Circle>();
+    if (wd.Active && !srdy)
+      {
+        Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, wd.Color, wdt);
+      }
+    else if (wd.Active && srdy)
+      {
+        if (_w.IsReady())
+          {
+            Render.Circle.DrawCircle(ObjectManager.Player.Position, _w.Range, wd.Color, wdt);
+          }
+      }
+  }
+  {
+    var edt = _config.Item("edt").GetValue<Slider>().Value;
+    var ed = _config.Item("ed").GetValue<Circle>();
+    if (ed.Active && !srdy)
+      {
+        Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, ed.Color, edt);
+      }
+    else if (ed.Active && srdy)
+      {
+        if (_e.IsReady())
+          {
+            Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range, ed.Color, edt);
+          }
+      }
+  }
+  {
+    var eadt = _config.Item("eadt").GetValue<Slider>().Value;
+    var ead = _config.Item("ead").GetValue<Circle>();
+    if (ead.Active && !srdy)
+      {
+        Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range + Orbwalking.GetRealAutoAttackRange(ObjectManager.Player), ead.Color, eadt);
+      }
+    else if (ead.Active && srdy)
+      {
+        if (_e.IsReady())
+          {
+            Render.Circle.DrawCircle(ObjectManager.Player.Position, _e.Range + Orbwalking.GetRealAutoAttackRange(ObjectManager.Player), ead.Color, eadt);
+          }
+      }
+  }
+  {
+    var rdt = _config.Item("rdt").GetValue<Slider>().Value;
+    var rd = _config.Item("rd").GetValue<Circle>();
+    if (rd.Active && !srdy)
+      {
+        Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, rd.Color, rdt);
+      }
+    else if (rd.Active && srdy)
+      {
+        if (_r.IsReady())
+          {
+            Render.Circle.DrawCircle(ObjectManager.Player.Position, _r.Range, rd.Color, rdt);
+          }
       }
   }
   {
     var qedt = _config.Item("qedt").GetValue<Slider>().Value;
     var qed = _config.Item("qed").GetValue<Circle>();
     var qedl = _config.Item("qedl").GetValue<bool>();
-    if (qed.Active && qedl)
+    if (qed.Active && qedl && srdy)
       {
         var manahh = _config.Item("manah").GetValue<Slider>().Value;
         var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
@@ -256,11 +335,31 @@ private static void OnDraw(EventArgs args)
               }
           }
       }
-    else if (qed.Active && !qedl)
+    else if (qed.Active && qedl && !srdy)
+      {
+        var manahh = _config.Item("manah").GetValue<Slider>().Value;
+        var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
+        var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+        if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
+          {
+            foreach (var minion in minions)
+              {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
+              }
+          }
+      }
+    else if (qed.Active && !qedl && !srdy)
       {
         Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
       }
-   }
+    else if (qed.Active && !qedl && srdy)
+      {
+        if (_q2.IsReady())
+          {
+            Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
+          }
+      }
+  }
 }
 #endregion
 #region switchoptionSEX
