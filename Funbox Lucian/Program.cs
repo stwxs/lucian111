@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using System.Drawing;
 using LeagueSharp;
 using LeagueSharp.Common;
+using Color = System.Drawing.Color;
 namespace Lucian
 {
 public class Program
@@ -31,7 +31,7 @@ public class Program
       _q2 = new Spell(SpellSlot.Q, 1200);
       _w = new Spell(SpellSlot.W, 1000);
       _e = new Spell(SpellSlot.E, 475);
-      _q2.SetSkillshot(0.55f, 75f, float.MaxValue, false, SkillshotType.SkillshotLine);
+      _q2.SetSkillshot(0.55f, 35, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
       _config = new Menu("Lucian", "Lucian", true);
@@ -53,8 +53,8 @@ public class Program
           _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(true));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qd", "Q normal").SetValue(true));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Drawing.OnDraw += OnDraw;
@@ -228,13 +228,13 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
-  var qde = _config.Item("qed").GetValue<bool>();
-  var qd = _config.Item("qd").GetValue<bool>();
-  if (qd)
+  var qnd = _config.Item("qnd").GetValue<Circle>();
+  var qed = _config.Item("qed").GetValue<Circle>();
+  if (qnd.Active)
     {
-      Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, Color.DarkRed, 5);
+      Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color);
     }
-  if (qde)
+  if (qed.Active)
     {
       var manahh = _config.Item("manah").GetValue<Slider>().Value;
       var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
@@ -243,7 +243,7 @@ private static void OnDraw(EventArgs args)
         {
           foreach (var minion in minions)
             {
-              Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, Color.DarkBlue, 10);
+              Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color);
             }
         }
     }
