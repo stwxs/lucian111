@@ -95,12 +95,12 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 {
                   if (!qbef)
                     {
-                      Utility.DelayAction.Add(100, CastQ);
+                      Utility.DelayAction.Add(300, CastQ);
                     }
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(150, CastW);
+                  Utility.DelayAction.Add(300, CastW);
                 }
             }
           else
@@ -109,12 +109,12 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 {
                   if (qaft)
                     {
-                      CastQ();
+                      Utility.DelayAction.Add(300, CastQ);
                     }
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(150, CastW);
+                  Utility.DelayAction.Add(300, CastW);
                 }
             }
         }
