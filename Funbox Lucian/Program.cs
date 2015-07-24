@@ -31,7 +31,7 @@ public class Program
       _q2 = new Spell(SpellSlot.Q, 1200);
       _w = new Spell(SpellSlot.W, 1000);
       _e = new Spell(SpellSlot.E, 475);
-      _q2.SetSkillshot(0.55f, 35, float.MaxValue, false, SkillshotType.SkillshotLine);
+      _q2.SetSkillshot(0.55f, 50f, float.MaxValue, false, SkillshotType.SkillshotLine);
       _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
       _w.MinHitChance = HitChance.Low;
       _config = new Menu("Lucian", "Lucian", true);
