@@ -53,7 +53,7 @@ public class Program
           _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 10, 255))));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").AddItem(new MenuItem("qndt", "Q normal thickness").SetValue(new Slider(5, 30, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").AddItem(new MenuItem("qedt", "Q Extended thickness").SetValue(new Slider(10, 30, 0)));
