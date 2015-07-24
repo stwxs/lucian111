@@ -53,8 +53,10 @@ public class Program
           _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
-      _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 10, 255))));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qndt", "Q normal thickness").SetValue(new Slider(5, 30, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qedt", "Q Extended thickness").SetValue(new Slider(10, 30, 0)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
       Drawing.OnDraw += OnDraw;
@@ -228,11 +230,13 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
+  var qndt = _config.Item("qndt").GetValue<Slider>().Value;
+  var qedt = _config.Item("qedt").GetValue<Slider>().Value;
   var qnd = _config.Item("qnd").GetValue<Circle>();
   var qed = _config.Item("qed").GetValue<Circle>();
   if (qnd.Active)
     {
-      Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color);
+      Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color, qndt);
     }
   if (qed.Active)
     {
@@ -243,7 +247,7 @@ private static void OnDraw(EventArgs args)
         {
           foreach (var minion in minions)
             {
-              Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color);
+              Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
             }
         }
     }
