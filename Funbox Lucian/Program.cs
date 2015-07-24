@@ -56,6 +56,7 @@ public class Program
       _config.SubMenu("Draw").AddItem(new MenuItem("qnd", "Q normal").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").AddItem(new MenuItem("qndt", "Q normal thickness").SetValue(new Slider(5, 30, 0)));
       _config.SubMenu("Draw").AddItem(new MenuItem("qed", "Q Extended").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").AddItem(new MenuItem("qedl", "Q Extended draw logic").SetValue(false));
       _config.SubMenu("Draw").AddItem(new MenuItem("qedt", "Q Extended thickness").SetValue(new Slider(10, 30, 0)));
       _config.AddToMainMenu();
       Orbwalking.AfterAttack += Orbwalking_AfterAttack;
@@ -230,27 +231,36 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
-  var qndt = _config.Item("qndt").GetValue<Slider>().Value;
-  var qedt = _config.Item("qedt").GetValue<Slider>().Value;
-  var qnd = _config.Item("qnd").GetValue<Circle>();
-  var qed = _config.Item("qed").GetValue<Circle>();
-  if (qnd.Active)
-    {
-      Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color, qndt);
-    }
-  if (qed.Active)
-    {
-      var manahh = _config.Item("manah").GetValue<Slider>().Value;
-      var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-      if (_q.IsReady() && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
-        {
-          foreach (var minion in minions)
-            {
-              Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
-            }
-        }
-    }
+  {
+    var qndt = _config.Item("qndt").GetValue<Slider>().Value;
+    var qnd = _config.Item("qnd").GetValue<Circle>();
+    if (qnd.Active)
+      {
+        Render.Circle.DrawCircle(ObjectManager.Player.Position, _q.Range, qnd.Color, qndt);
+      }
+  }
+  {
+    var qedt = _config.Item("qedt").GetValue<Slider>().Value;
+    var qed = _config.Item("qed").GetValue<Circle>();
+    var qedl = _config.Item("qedl").GetValue<bool>();
+    if (qed.Active && qedl)
+      {
+        var manahh = _config.Item("manah").GetValue<Slider>().Value;
+        var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
+        var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+        if (_q2.IsReady() && (ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.Distance(ObjectManager.Player.Position) < _q2.Range)
+          {
+            foreach (var minion in minions)
+              {
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
+              }
+          }
+      }
+    else if (qed.Active && !qedl)
+      {
+        Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
+      }
+   }
 }
 #endregion
 #region switchoptionSEX
