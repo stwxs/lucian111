@@ -61,7 +61,10 @@ private static void Game_OnUpdate(EventArgs args)
       CastQexharass();
       CastQharass();
     }
-  eswitch();
+  if (_config.Item("eswitch").GetValue<KeyBind>().Active)
+    {
+      eswitch();
+    }
 }
 
 
