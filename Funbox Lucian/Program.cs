@@ -83,10 +83,11 @@ private static void CastW()
 //KILLSTEAL
 private static void CastQkillsteal()
 {
+  var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      if (((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > 30) && ((tt.Health/tt.MaxHealth)*100 <= 20) && (tt.Distance(ObjectManager.Player.Position) > 400))
+      if (((tt.Health/tt.MaxHealth)*100 <= enemyhp) && (tt.Distance(ObjectManager.Player.Position) > 400))
         {
           if (_q.IsReady())
             {
@@ -226,6 +227,7 @@ private static void menu()
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
+      _config.SubMenu("Combo").SubMenu("Q settings").AddItem(new MenuItem("qsetba", "if enemy %hp then use Q before attack").SetValue(new Slider(30, 60, 0)));
       _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
