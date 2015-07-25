@@ -26,8 +26,11 @@ private static void Game_OnGameLoad(EventArgs args)
 }
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
-  Emodeoff();
-  Emodeaa();
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+    {
+      Emodeoff();
+      Emodeaa();
+    }
 }
 private static void OnDraw(EventArgs args)
 {
@@ -53,8 +56,11 @@ private static void Game_OnUpdate(EventArgs args)
     {
       CastQkillsteal();
     }
-  CastQexharass();
-  CastQharass();
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+    {
+      CastQexharass();
+      CastQharass();
+    }
   eswitch();
 }
 
@@ -109,8 +115,6 @@ private static void Emodeaa()
   var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
     {
-      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
-        {
           if (ec)
             {
               if (_e.IsReady())
@@ -150,15 +154,12 @@ private static void Emodeaa()
             }
         }
     }
-}
 private static void Emodeoff()
 {
   var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   var ec = _config.Item("e").GetValue<bool>();
     {
-      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
-        {
           if (!ec)
             {
               if (_q.IsReady())
@@ -175,7 +176,6 @@ private static void Emodeoff()
             }
         }
     }
-}
 
 
 
@@ -186,21 +186,16 @@ private static void CastQharass()
 {
   var manahh = _config.Item("manah").GetValue<Slider>().Value;
   var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
-    {
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
         {
           _q.CastOnUnit(t);
         }
     }
-}
 private static void CastQexharass()
 {
   var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
   var manahh = _config.Item("manah").GetValue<Slider>().Value;
   var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-  if ((_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear) || (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit) || (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
-    {
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
         {
           foreach (var minion in minions)
@@ -212,7 +207,6 @@ private static void CastQexharass()
             }
         }
     }
-}
 
 
 
