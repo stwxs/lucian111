@@ -58,13 +58,13 @@ public class Program
       _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qnd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qndt", "thickness").SetValue(new Slider(10, 20, 0)));
       _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qed", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-      _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedl", "draw logic").SetValue(false));
+      _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedl", "draw logic").SetValue(true));
       _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedt", "thickness").SetValue(new Slider(10, 20, 0)));
       _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wdt", "thickness").SetValue(new Slider(10, 20, 0)));
       _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("ed", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("edt", "thickness").SetValue(new Slider(10, 20, 0)));
-      _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("ead", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+      _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("ead", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("eadt", "thickness").SetValue(new Slider(10, 20, 0)));
       _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rdt", "thickness").SetValue(new Slider(10, 20, 0)));
