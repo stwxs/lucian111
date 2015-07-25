@@ -177,27 +177,27 @@ private static void CastQharass()
 {
   var manahh = _config.Item("manah").GetValue<Slider>().Value;
   var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
-        {
-          _q.CastOnUnit(t);
-        }
+  if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
+    {
+      _q.CastOnUnit(t);
     }
+}
 private static void CastQexharass()
 {
   var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
   var manahh = _config.Item("manah").GetValue<Slider>().Value;
   var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+  if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+    {
+      foreach (var minion in minions)
         {
-          foreach (var minion in minions)
+          if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
             {
-              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
-                {
-                  _q2.CastOnUnit(minion);
-                }
+              _q2.CastOnUnit(minion);
             }
         }
     }
+}
 
 
 
@@ -206,77 +206,77 @@ private static void CastQexharass()
 //menu
 private static void menu()
 {
-      if (ObjectManager.Player.ChampionName != "Lucian")
-        return;
-      _q = new Spell(SpellSlot.Q, 675);
-      _q2 = new Spell(SpellSlot.Q, 1200);
-      _w = new Spell(SpellSlot.W, 1000);
-      _e = new Spell(SpellSlot.E, 475);
-      _r = new Spell(SpellSlot.R, 1400);
-      _q2.SetSkillshot(0.55f, 50f, float.MaxValue, false, SkillshotType.SkillshotLine);
-      _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
-      _w.MinHitChance = HitChance.Low;
-      _config = new Menu("Lucian", "Lucian", true);
-      _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
-      var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
-      TargetSelector.AddToMenu(targetSelectorMenu);
-      _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Combo").SubMenu("Q settings").AddItem(new MenuItem("qsetba", "if enemy %hp then use Q before attack").SetValue(new Slider(30, 60, 0)));
-      _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-      _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse"})));
-      _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
-      foreach (var hero in HeroManager.Enemies)
-        {
-          _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
-        }
-      _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
-      _config.SubMenu("Draw").AddItem(new MenuItem("empd", "draw E mode text").SetValue(true));
-      _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("qmo", "Q").SetValue(false));
-      _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("qexmo", "Q Extended").SetValue(false));
-      _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("wmo", "W").SetValue(false));
-      _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("emo", "E").SetValue(false));
-      _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("eaamo", "E + AA").SetValue(false));
-      _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("rmo", "R").SetValue(false));
-      if (_config.Item("qmo").GetValue<bool>() || _config.Item("qexmo").GetValue<bool>() || _config.Item("wmo").GetValue<bool>() || _config.Item("emo").GetValue<bool>() || _config.Item("eaamo").GetValue<bool>() || _config.Item("rmo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").AddItem(new MenuItem("srdy", "if spells ready to use").SetValue(false));
-        }
-      if (_config.Item("qmo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qnd", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-          _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qndt", "thickness").SetValue(new Slider(10, 20, 0)));
-        }
-      if (_config.Item("qexmo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qed", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-          _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedl", "draw logic").SetValue(true));
-          _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedt", "thickness").SetValue(new Slider(10, 20, 0)));
-        }
-      if (_config.Item("wmo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
-          _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wdt", "thickness").SetValue(new Slider(10, 20, 0)));
-        }
-      if (_config.Item("emo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("ed", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
-          _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("edt", "thickness").SetValue(new Slider(10, 20, 0)));
-        }
-      if (_config.Item("eaamo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("ead", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
-          _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("eadt", "thickness").SetValue(new Slider(10, 20, 0)));
-        }
-      if (_config.Item("rmo").GetValue<bool>())
-        {
-          _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
-          _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rdt", "thickness").SetValue(new Slider(10, 20, 0)));
-        }
-      _config.AddToMainMenu();
-      Orbwalking.AfterAttack += Orbwalking_AfterAttack;
-      Drawing.OnDraw += OnDraw;
-      Game.OnUpdate += Game_OnUpdate;
+  if (ObjectManager.Player.ChampionName != "Lucian")
+    return;
+  _q = new Spell(SpellSlot.Q, 675);
+  _q2 = new Spell(SpellSlot.Q, 1200);
+  _w = new Spell(SpellSlot.W, 1000);
+  _e = new Spell(SpellSlot.E, 475);
+  _r = new Spell(SpellSlot.R, 1400);
+  _q2.SetSkillshot(0.55f, 50f, float.MaxValue, false, SkillshotType.SkillshotLine);
+  _w.SetSkillshot(0.25f, 70, 1500, false, SkillshotType.SkillshotLine);
+  _w.MinHitChance = HitChance.Low;
+  _config = new Menu("Lucian", "Lucian", true);
+  _orbwalker = new Orbwalking.Orbwalker(_config.SubMenu("Orbwalking"));
+  var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
+  TargetSelector.AddToMenu(targetSelectorMenu);
+  _config.AddSubMenu(targetSelectorMenu);
+  _config.SubMenu("Combo").SubMenu("Q settings").AddItem(new MenuItem("qsetba", "if enemy %hp then use Q before attack").SetValue(new Slider(30, 60, 0)));
+  _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
+  _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+  _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse"})));
+  _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
+  foreach (var hero in HeroManager.Enemies)
+    {
+      _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
+    }
+  _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
+  _config.SubMenu("Draw").AddItem(new MenuItem("empd", "draw E mode text").SetValue(true));
+  _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("qmo", "Q").SetValue(false));
+  _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("qexmo", "Q Extended").SetValue(false));
+  _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("wmo", "W").SetValue(false));
+  _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("emo", "E").SetValue(false));
+  _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("eaamo", "E + AA").SetValue(false));
+  _config.SubMenu("Draw").SubMenu("ON/OFF reload F5").AddItem(new MenuItem("rmo", "R").SetValue(false));
+    if (_config.Item("qmo").GetValue<bool>() || _config.Item("qexmo").GetValue<bool>() || _config.Item("wmo").GetValue<bool>() || _config.Item("emo").GetValue<bool>() || _config.Item("eaamo").GetValue<bool>() || _config.Item("rmo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").AddItem(new MenuItem("srdy", "if spells ready to use").SetValue(false));
+      }
+    if (_config.Item("qmo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qnd", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+        _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qndt", "thickness").SetValue(new Slider(10, 20, 0)));
+      }
+    if (_config.Item("qexmo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qed", "ON/OFF").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+        _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedl", "draw logic").SetValue(true));
+        _config.SubMenu("Draw").SubMenu("Q Extended").AddItem(new MenuItem("qedt", "thickness").SetValue(new Slider(10, 20, 0)));
+      }
+    if (_config.Item("wmo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+        _config.SubMenu("Draw").SubMenu("W").AddItem(new MenuItem("wdt", "thickness").SetValue(new Slider(10, 20, 0)));
+      }
+    if (_config.Item("emo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("ed", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+        _config.SubMenu("Draw").SubMenu("E").AddItem(new MenuItem("edt", "thickness").SetValue(new Slider(10, 20, 0)));
+      }
+    if (_config.Item("eaamo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("ead", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+        _config.SubMenu("Draw").SubMenu("E+AA").AddItem(new MenuItem("eadt", "thickness").SetValue(new Slider(10, 20, 0)));
+      }
+    if (_config.Item("rmo").GetValue<bool>())
+      {
+        _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
+        _config.SubMenu("Draw").SubMenu("R").AddItem(new MenuItem("rdt", "thickness").SetValue(new Slider(10, 20, 0)));
+      }
+  _config.AddToMainMenu();
+  Orbwalking.AfterAttack += Orbwalking_AfterAttack;
+  Drawing.OnDraw += OnDraw;
+  Game.OnUpdate += Game_OnUpdate;
 }
 
 
@@ -312,22 +312,22 @@ private static void eswitch()
 //Drawings
 private static void emodedrawtext()
 {
-    var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
-    var emp = _config.Item("emod").GetValue<StringList>().SelectedIndex;
-    var empd = _config.Item("empd").GetValue<bool>();
-    var eon = _config.Item("e").GetValue<bool>();
-    if (empd && eon)
-      {
-        switch (emp)
-          {
-            case 0:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "S A F E");
-            break;
-            case 1:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To mouse");
-            break;
-          }
-      }
+  var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
+  var emp = _config.Item("emod").GetValue<StringList>().SelectedIndex;
+  var empd = _config.Item("empd").GetValue<bool>();
+  var eon = _config.Item("e").GetValue<bool>();
+  if (empd && eon)
+    {
+      switch (emp)
+        {
+          case 0:
+            Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "S A F E");
+          break;
+          case 1:
+            Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To mouse");
+          break;
+        }
+    }
 }
 /*Draw ready spells*/
 private static void qreadydraw()
