@@ -54,7 +54,18 @@ private static void Game_OnUpdate(EventArgs args)
 {
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      CastQkillsteal();
+      if (ObjectManager.Player.Level <= 6)
+        {
+          CastQbeforeattack6();
+        }
+      if (ObjectManager.Player.Level > 6 && ObjectManager.Player.Level <= 11)
+        {
+          CastQbeforeattack11();
+        }
+      if (ObjectManager.Player.Level > 11 && ObjectManager.Player.Level <= 18)
+        {
+          CastQbeforeattack18();
+        }
     }
   if (_q.IsReady() && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
     {
@@ -92,12 +103,33 @@ private static void CastW()
 
 
 
-//KILLSTEAL
-private static void CastQkillsteal()
+//Qbefore attack
+private static void CastQbeforeattack6()
 {
-  var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-  if (((tt.Health/tt.MaxHealth)*100 <= enemyhp))
+  if (tt.Health < 200)
+    {
+      if (_q.IsReady())
+        {
+          CastQ();
+        }
+    }
+}
+private static void CastQbeforeattack11()
+{
+  var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+  if (tt.Health < 350)
+    {
+      if (_q.IsReady())
+        {
+          CastQ();
+        }
+    }
+}
+private static void CastQbeforeattack18()
+{
+  var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+  if (tt.Health < 500)
     {
       if (_q.IsReady())
         {
@@ -113,58 +145,45 @@ private static void CastQkillsteal()
 //AFTER ATTACK
 private static void Emodeaa()
 {
-  var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
+  var tt = TargetSelector.GetTarget(Orbwalking.GetRealAutoAttackRange(ObjectManager.Player) + 60, TargetSelector.DamageType.Physical);
   var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
-  var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+  if (_e.IsReady())
     {
-      if (_e.IsReady())
+      if (emod == 0)
         {
-          if (emod == 0)
+          var pos = Geometry.CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), Prediction.GetPrediction(tt, 0.25f).UnitPosition.To2D(), _e.Range, Orbwalking.GetRealAutoAttackRange(tt));
+          if (pos.Count() > 0)
             {
-              var pos = Geometry.CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), Prediction.GetPrediction(tt, 0.25f).UnitPosition.To2D(), _e.Range, Orbwalking.GetRealAutoAttackRange(tt));
-              if (pos.Count() > 0)
-                {
-                  _e.Cast(pos.MinOrDefault(i => i.Distance(Game.CursorPos)));
-                }
-              else
-                {
-                  _e.Cast(ObjectManager.Player.ServerPosition.Extend(tt.ServerPosition, -_e.Range));
-                }
+              _e.Cast(pos.MinOrDefault(i => i.Distance(Game.CursorPos)));
             }
-          else if (emod == 1)
+          else
             {
-              _e.Cast(Game.CursorPos);
+              _e.Cast(ObjectManager.Player.ServerPosition.Extend(tt.ServerPosition, -_e.Range));
             }
         }
-      else if (_q.IsReady())
+      else if (emod == 1)
         {
-          if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
-            {
-              Utility.DelayAction.Add(350, CastQ);
-            }
+          _e.Cast(Game.CursorPos);
         }
-      else if (_w.IsReady())
-        {
-          Utility.DelayAction.Add(450, CastW);
-        }
+    }
+  else if (_q.IsReady())
+    {
+      Utility.DelayAction.Add(350, CastQ);
+    }
+  else if (_w.IsReady())
+    {
+      Utility.DelayAction.Add(450, CastW);
     }
 }
 private static void Emodeoff()
 {
-  var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
-  var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+  if (_q.IsReady())
     {
-      if (_q.IsReady())
-        {
-          if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
-            {
-              Utility.DelayAction.Add(350, CastQ);
-            }
-        }
-      else if (_w.IsReady())
-        {
-          Utility.DelayAction.Add(450, CastW);
-        }
+      Utility.DelayAction.Add(350, CastQ);
+    }
+  else if (_w.IsReady())
+    {
+      Utility.DelayAction.Add(450, CastW);
     }
 }
 
@@ -221,7 +240,6 @@ private static void menu()
   var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
   TargetSelector.AddToMenu(targetSelectorMenu);
   _config.AddSubMenu(targetSelectorMenu);
-  _config.SubMenu("Combo").SubMenu("Q settings").AddItem(new MenuItem("qsetba", "if enemy %hp then use Q before attack").SetValue(new Slider(30, 60, 0)));
   _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
   _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
   _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse"})));
