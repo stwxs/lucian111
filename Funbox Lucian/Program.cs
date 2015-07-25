@@ -26,8 +26,8 @@ private static void Game_OnGameLoad(EventArgs args)
 }
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
-  Emodeaa();
   Emodeoff();
+  Emodeaa();
 }
 private static void OnDraw(EventArgs args)
 {
@@ -49,7 +49,10 @@ private static void OnDraw(EventArgs args)
 }
 private static void Game_OnUpdate(EventArgs args)
 {
-  CastQkillsteal();
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+    {
+      CastQkillsteal();
+    }
   CastQexharass();
   CastQharass();
   eswitch();
@@ -85,14 +88,11 @@ private static void CastQkillsteal()
 {
   var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+  if (((tt.Health/tt.MaxHealth)*100 <= enemyhp))
     {
-      if (((tt.Health/tt.MaxHealth)*100 <= enemyhp))
+      if (_q.IsReady())
         {
-          if (_q.IsReady())
-            {
-              CastQ();
-            }
+          CastQ();
         }
     }
 }
@@ -104,6 +104,7 @@ private static void CastQkillsteal()
 //AFTER ATTACK
 private static void Emodeaa()
 {
+  var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
   var ec = _config.Item("e").GetValue<bool>();
   var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
@@ -137,7 +138,10 @@ private static void Emodeaa()
                 }
               else if (_q.IsReady())
                 {
-                  Utility.DelayAction.Add(350, CastQ);
+                  if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
+                    {
+                      Utility.DelayAction.Add(350, CastQ);
+                    }
                 }
               else if (_w.IsReady())
                 {
@@ -149,6 +153,8 @@ private static void Emodeaa()
 }
 private static void Emodeoff()
 {
+  var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
+  var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   var ec = _config.Item("e").GetValue<bool>();
     {
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -157,7 +163,10 @@ private static void Emodeoff()
             {
               if (_q.IsReady())
                 {
-                  Utility.DelayAction.Add(350, CastQ);
+                  if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
+                    {
+                      Utility.DelayAction.Add(350, CastQ);
+                    }
                 }
               else if (_w.IsReady())
                 {
