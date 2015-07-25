@@ -42,10 +42,9 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qmod", "Q combo mode").SetValue(new StringList(new[]{"after attack", "before attack"})));
-      _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
-      _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-      _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
+      _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
+      _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+      _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
       _config.SubMenu("Harass").SubMenu("Q Settings").AddItem(new MenuItem("qnormod", "Q harass mode").SetValue(new StringList(new[]{"laneclear | mixed | last hit", "auto"})));
       _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qexmod", "Q Extended harass mode").SetValue(new StringList(new[]{"laneclear | mixed | last hit", "auto"})));
       _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
@@ -79,7 +78,6 @@ public class Program
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var qmod = _config.Item("qmod").GetValue<StringList>().SelectedIndex;
   var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
   if (unit.IsMe)
     {
@@ -114,28 +112,22 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_q.IsReady())
                 {
-                  if (qmod == 0)
-                    {
-                      Utility.DelayAction.Add(200, CastQ);
-                    }
+                  Utility.DelayAction.Add(400, CastQ);
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(300, CastW);
+                  Utility.DelayAction.Add(400, CastW);
                 }
             }
           else
             {
               if (_q.IsReady())
                 {
-                  if (qmod == 0)
-                    {
-                      Utility.DelayAction.Add(200, CastQ);
-                    }
+                  Utility.DelayAction.Add(400, CastQ);
                 }
               else if (_w.IsReady())
                 {
-                  Utility.DelayAction.Add(300, CastW);
+                  Utility.DelayAction.Add(400, CastW);
                 }
             }
         }
@@ -145,17 +137,12 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var qmod = _config.Item("qmod").GetValue<StringList>().SelectedIndex;
   var qharassmode = _config.Item("qnormod").GetValue<StringList>().SelectedIndex;
   var qexharassmode = _config.Item("qexmod").GetValue<StringList>().SelectedIndex;
   var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
   var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
   var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
   var manahh = _config.Item("manah").GetValue<Slider>().Value;
-  if (qmod == 1 && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
-    {
-      CastQbef();
-    }
   if (qharassmode == 1 && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
@@ -207,17 +194,6 @@ private static void CastQ()
   Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
-#region Qbef
-private static void CastQbef()
-{
-  var qtarget = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-  _q.Cast(qtarget);
-    if (_q.Cast(qtarget) == Spell.CastStates.SuccessfullyCasted)
-      {
-        Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
-      }
-}
-#endregion
 #region W
 private static void CastW()
 {
@@ -236,7 +212,8 @@ private static void OnDraw(EventArgs args)
     var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
     var emp = _config.Item("emod").GetValue<StringList>().SelectedIndex;
     var empd = _config.Item("empd").GetValue<bool>();
-    if (empd)
+    var eon = _config.Item("e").GetValue<bool>();
+    if (empd && eon)
       {
         switch (emp)
           {
