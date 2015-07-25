@@ -87,7 +87,7 @@ private static void CastQkillsteal()
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      if (((tt.Health/tt.MaxHealth)*100 <= enemyhp) && (tt.Distance(ObjectManager.Player.Position) > 400))
+      if (((tt.Health/tt.MaxHealth)*100 <= enemyhp))
         {
           if (_q.IsReady())
             {
