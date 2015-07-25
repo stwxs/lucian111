@@ -15,14 +15,21 @@ public class Program
   private static Spell _w;
   private static Spell _e;
   private static Spell _r;
+  private static int _lastTick;
   private static string[] select = {"Ashe", "Caitlyn", "Corki", "Draven", "Ezreal", "Graves", "Jinx", "Kalista", "KogMaw", "Lucian", "MissFortune","Quinn","Sivir","Teemo","Tristana","TwistedFate","Twitch","Urgot","Varus","Vayne"};
 #endregion
+
+
+
 #region Main
   private static void Main(string[] args)
     {
       CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
     }
 #endregion
+
+
+
 #region OnGameLoad
   private static void Game_OnGameLoad(EventArgs args)
     {
@@ -44,6 +51,8 @@ public class Program
       _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaa", "Q before attack").SetValue(false));
       _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaaa", "Q after attack E off").SetValue(true));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
+      _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+      _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
       //_config.SubMenu("Killsteal").AddItem(new MenuItem("qec" , "Q Extended").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("qn" , "normal Q - target in autoattack range").SetValue(true));
       _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("aqn" , "Auto normal Q - target in autoattack range").SetValue(false));
@@ -55,6 +64,7 @@ public class Program
           _config.SubMenu("Harass").AddItem(new MenuItem("auto" + hero.ChampionName, hero.ChampionName).SetValue(select.Contains(hero.ChampionName)));
         }
       _config.SubMenu("Harass").AddItem(new MenuItem("manah", "%mana").SetValue(new Slider(33, 100, 0)));
+      _config.SubMenu("Draw").AddItem(new MenuItem("empd", "draw E mode text").SetValue(true));
       _config.SubMenu("Draw").AddItem(new MenuItem("srdy", "if spells ready to use").SetValue(false));
       _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qnd", "ON/OFF").SetValue(new Circle(false, Color.FromArgb(100, 255, 0, 255))));
       _config.SubMenu("Draw").SubMenu("Q").AddItem(new MenuItem("qndt", "thickness").SetValue(new Slider(10, 20, 0)));
@@ -75,12 +85,16 @@ public class Program
       Game.OnUpdate += Game_OnUpdate;
     }
 #endregion
+
+
+
 #region after attack
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
   var ec = _config.Item("e").GetValue<bool>();
   var qbef = _config.Item("qcaa").GetValue<bool>();
   var qaft = _config.Item("qcaaa").GetValue<bool>();
+  var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
   if (unit.IsMe)
     {
       if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
@@ -89,7 +103,29 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
             {
               if (_e.IsReady())
                 {
-                  _e.Cast(Game.CursorPos);
+                  //E SAFE MODE THANKS TO -> https://github.com/brian0305/LeagueSharp
+                  if (emod == 0)
+                    {
+                      var obj = (Obj_AI_Base) target;
+                      var pos = Geometry.CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), Prediction.GetPrediction(obj, 0.25f).UnitPosition.To2D(), _e.Range, Orbwalking.GetRealAutoAttackRange(obj));
+                      if (pos.Count() > 0)
+                        {
+                          _e.Cast(pos.MinOrDefault(i => i.Distance(Game.CursorPos)));
+                        }
+                      else
+                        {
+                          _e.Cast(ObjectManager.Player.ServerPosition.Extend(obj.ServerPosition, -_e.Range));
+                        }
+                    }
+                  else if (emod == 1)
+                    {
+                      _e.Cast(Game.CursorPos);
+                    }
+                  else if (emod == 2)
+                    {
+                      var obj = (Obj_AI_Base) target;
+                      _e.Cast(obj.ServerPosition);
+                    }
                 }
               else if (_q.IsReady())
                 {
@@ -121,6 +157,9 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
     }
 }
 #endregion
+
+
+
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
@@ -203,12 +242,16 @@ private static void Game_OnUpdate(EventArgs args)
             }
         }
     }
+  eswitch();
   SwitchOptionSEX();
   SwitchOptionsnq();
   SwitchOptionseqc();
   SwitchOptionsdas();
 }
 #endregion
+
+
+
 #region Q
 private static void CastQ()
 {
@@ -217,6 +260,9 @@ private static void CastQ()
   Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
+
+
+
 #region Qbef
 private static void CastQbef()
 {
@@ -228,6 +274,9 @@ private static void CastQbef()
       }
 }
 #endregion
+
+
+
 #region W
 private static void CastW()
 {
@@ -239,6 +288,9 @@ private static void CastW()
       }
 }
 #endregion
+
+
+
 #region draw
 private static void OnDraw(EventArgs args)
 {
@@ -258,6 +310,7 @@ private static void OnDraw(EventArgs args)
           }
       }
   }
+  
   {
     var wdt = _config.Item("wdt").GetValue<Slider>().Value;
     var wd = _config.Item("wd").GetValue<Circle>();
@@ -273,6 +326,7 @@ private static void OnDraw(EventArgs args)
           }
       }
   }
+  
   {
     var edt = _config.Item("edt").GetValue<Slider>().Value;
     var ed = _config.Item("ed").GetValue<Circle>();
@@ -288,6 +342,7 @@ private static void OnDraw(EventArgs args)
           }
       }
   }
+  
   {
     var eadt = _config.Item("eadt").GetValue<Slider>().Value;
     var ead = _config.Item("ead").GetValue<Circle>();
@@ -303,6 +358,7 @@ private static void OnDraw(EventArgs args)
           }
       }
   }
+  
   {
     var rdt = _config.Item("rdt").GetValue<Slider>().Value;
     var rd = _config.Item("rd").GetValue<Circle>();
@@ -318,6 +374,7 @@ private static void OnDraw(EventArgs args)
           }
       }
   }
+  
   {
     var qedt = _config.Item("qedt").GetValue<Slider>().Value;
     var qed = _config.Item("qed").GetValue<Circle>();
@@ -360,8 +417,32 @@ private static void OnDraw(EventArgs args)
           }
       }
   }
+  
+  {
+    var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
+    var emp = _config.Item("emod").GetValue<StringList>().SelectedIndex;
+    var empd = _config.Item("empd").GetValue<bool>();
+    if (empd)
+      {
+        switch (emp)
+          {
+            case 0:
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "Safe");
+            break;
+            case 1:
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To mouse");
+            break;
+            case 2:
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To target");
+            break;
+          }
+      }
+  }
 }
 #endregion
+
+
+
 #region switchoptionSEX
 private static void SwitchOptionSEX()
   {
@@ -371,6 +452,9 @@ private static void SwitchOptionSEX()
       }
   }
 #endregion
+
+
+
 #region switchoptionsnq
 private static void SwitchOptionsnq()
   {
@@ -380,6 +464,9 @@ private static void SwitchOptionsnq()
       }
   }
 #endregion
+
+
+
 #region switchoptionseqc
 private static void SwitchOptionseqc()
   {
@@ -389,6 +476,9 @@ private static void SwitchOptionseqc()
       }
   }
 #endregion
+
+
+
 #region switchoptionsdas
 private static void SwitchOptionsdas()
   {
@@ -399,5 +489,33 @@ private static void SwitchOptionsdas()
       }
   }
 #endregion
+
+#region eswitch
+private static void eswitch()
+{
+  var emode = _config.Item("emod").GetValue<StringList>().SelectedIndex;
+  var lasttime = Environment.TickCount - _lastTick;
+  if (!_config.Item("eswitch").GetValue<KeyBind>().Active || lasttime <= Game.Ping)
+    {
+      return;
+    }
+  switch (emode)
+    {
+      case 0:
+        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"}, 1));
+        _lastTick = Environment.TickCount + 300;
+      break;
+      case 1:
+        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"}, 2));
+        _lastTick = Environment.TickCount + 300;
+      break;
+      case 2:
+        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"}));
+        _lastTick = Environment.TickCount + 300;
+      break;
+    }
+}
+#endregion
+
 }
 }
