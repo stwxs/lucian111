@@ -45,8 +45,6 @@ public class Program
       _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
-      _config.SubMenu("Harass").SubMenu("Q Settings").AddItem(new MenuItem("qnormod", "Q harass mode").SetValue(new StringList(new[]{"laneclear | mixed | last hit", "auto"})));
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qexmod", "Q Extended harass mode").SetValue(new StringList(new[]{"laneclear | mixed | last hit", "auto"})));
       _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
       foreach (var hero in HeroManager.Enemies)
         {
@@ -137,52 +135,9 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var qharassmode = _config.Item("qnormod").GetValue<StringList>().SelectedIndex;
-  var qexharassmode = _config.Item("qexmod").GetValue<StringList>().SelectedIndex;
-  var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-  var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-  var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-  var manahh = _config.Item("manah").GetValue<Slider>().Value;
-  if (qharassmode == 1 && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
-    {
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
-        {
-          _q.CastOnUnit(t);
-        }
-    }
-  if (qharassmode == 0 && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
-    {
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
-        {
-          _q.CastOnUnit(t);
-        }
-    }
-  if (qexharassmode == 1 && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
-    {
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
-        {
-          foreach (var minion in minions)
-            {
-              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
-                {
-                  _q2.CastOnUnit(minion);
-                }
-            }
-        }
-    }
-  if (qexharassmode == 0 && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
-    {
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
-        {
-          foreach (var minion in minions)
-            {
-              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
-                {
-                  _q2.CastOnUnit(minion);
-                }
-            }
-        }
-    }
+  CastQkillsteal();
+  CastQexharass();
+  CastQharass();
   eswitch();
 }
 #endregion
@@ -203,6 +158,57 @@ private static void CastW()
       {
         Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
       }
+}
+#endregion
+#region Q harass
+private static void CastQharass()
+{
+  var manahh = _config.Item("manah").GetValue<Slider>().Value;
+  var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+    {
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
+        {
+          _q.CastOnUnit(t);
+        }
+    }
+}
+#endregion
+#region Q ex harass
+private static void CastQexharass()
+{
+  var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
+  var manahh = _config.Item("manah").GetValue<Slider>().Value;
+  var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+  if ((_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear) || (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit) || (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
+    {
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+        {
+          foreach (var minion in minions)
+            {
+              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
+                {
+                  _q2.CastOnUnit(minion);
+                }
+            }
+        }
+    }
+}
+#endregion
+#region Q killsteal
+private static void CastQkillsteal()
+{
+  var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
+  if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+    {
+      if (((ObjectManager.Player.Health/ObjectManager.Player.MaxHealth)*100 > 30) && ((tt.Health/tt.MaxHealth)*100 <= 20) && (tt.Distance(ObjectManager.Player.Position) > 500))
+        {
+          if (_q.IsReady())
+            {
+              CastQ();
+            }
+        }
+    }
 }
 #endregion
 #region draw
