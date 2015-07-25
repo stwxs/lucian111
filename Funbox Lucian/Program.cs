@@ -18,18 +18,12 @@ public class Program
   private static int _lastTick;
   private static string[] select = {"Ashe", "Caitlyn", "Corki", "Draven", "Ezreal", "Graves", "Jinx", "Kalista", "KogMaw", "Lucian", "MissFortune","Quinn","Sivir","Teemo","Tristana","TwistedFate","Twitch","Urgot","Varus","Vayne"};
 #endregion
-
-
-
 #region Main
   private static void Main(string[] args)
     {
       CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
     }
 #endregion
-
-
-
 #region OnGameLoad
   private static void Game_OnGameLoad(EventArgs args)
     {
@@ -48,16 +42,12 @@ public class Program
       var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
       TargetSelector.AddToMenu(targetSelectorMenu);
       _config.AddSubMenu(targetSelectorMenu);
-      _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaa", "Q before attack").SetValue(false));
-      _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qcaaa", "Q after attack E off").SetValue(true));
+      _config.SubMenu("Combo").SubMenu("Q Settings").AddItem(new MenuItem("qmod", "Q combo mode").SetValue(new StringList(new[]{"after attack", "before attack"})));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
       _config.SubMenu("Combo").SubMenu("E Settings").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
-      //_config.SubMenu("Killsteal").AddItem(new MenuItem("qec" , "Q Extended").SetValue(true));
-      _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("qn" , "normal Q - target in autoattack range").SetValue(true));
-      _config.SubMenu("Harass").SubMenu("Q normal Settings").AddItem(new MenuItem("aqn" , "Auto normal Q - target in autoattack range").SetValue(false));
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qe" , "Q Extended").SetValue(true));
-      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("aqe" , "Auto Q Extended").SetValue(false));
+      _config.SubMenu("Harass").SubMenu("Q Settings").AddItem(new MenuItem("qnormod", "Q harass mode").SetValue(new StringList(new[]{"laneclear | mixed | last hit", "auto"})));
+      _config.SubMenu("Harass").SubMenu("Q Extended Settings").AddItem(new MenuItem("qexmod", "Q Extended harass mode").SetValue(new StringList(new[]{"laneclear | mixed | last hit", "auto"})));
       _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
       foreach (var hero in HeroManager.Enemies)
         {
@@ -85,15 +75,11 @@ public class Program
       Game.OnUpdate += Game_OnUpdate;
     }
 #endregion
-
-
-
 #region after attack
 private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
 {
   var ec = _config.Item("e").GetValue<bool>();
-  var qbef = _config.Item("qcaa").GetValue<bool>();
-  var qaft = _config.Item("qcaaa").GetValue<bool>();
+  var qmod = _config.Item("qmod").GetValue<StringList>().SelectedIndex;
   var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
   if (unit.IsMe)
     {
@@ -103,7 +89,6 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
             {
               if (_e.IsReady())
                 {
-                  //E SAFE MODE THANKS TO -> https://github.com/brian0305/LeagueSharp
                   if (emod == 0)
                     {
                       var obj = (Obj_AI_Base) target;
@@ -129,9 +114,9 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
                 }
               else if (_q.IsReady())
                 {
-                  if (!qbef)
+                  if (qmod == 0)
                     {
-                      Utility.DelayAction.Add(300, CastQ);
+                      Utility.DelayAction.Add(200, CastQ);
                     }
                 }
               else if (_w.IsReady())
@@ -143,9 +128,9 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
             {
               if (_q.IsReady())
                 {
-                  if (qaft)
+                  if (qmod == 0)
                     {
-                      Utility.DelayAction.Add(300, CastQ);
+                      Utility.DelayAction.Add(200, CastQ);
                     }
                 }
               else if (_w.IsReady())
@@ -157,101 +142,63 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
     }
 }
 #endregion
-
-
-
 #region OnGameUpdate
 private static void Game_OnUpdate(EventArgs args)
 {
-  var qbef = _config.Item("qcaa").GetValue<bool>();
-  var qex = _config.Item("qe").GetValue<bool>();
-  var aqex = _config.Item("aqe").GetValue<bool>();
-  //var qexc = _config.Item("qec").GetValue<bool>();
-  var autoqnor = _config.Item("aqn").GetValue<bool>();
-  var qnor = _config.Item("qn").GetValue<bool>();
-  if (qbef && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+  var qmod = _config.Item("qmod").GetValue<StringList>().SelectedIndex;
+  var qharassmode = _config.Item("qnormod").GetValue<StringList>().SelectedIndex;
+  var qexharassmode = _config.Item("qexmod").GetValue<StringList>().SelectedIndex;
+  var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
+  var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+  var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
+  var manahh = _config.Item("manah").GetValue<Slider>().Value;
+  if (qmod == 1 && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
       CastQbef();
     }
-  if (qex && aqex && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+  if (qharassmode == 1 && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
     {
-      var manahh = _config.Item("manah").GetValue<Slider>().Value;
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-      var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
-        {
-          foreach (var minion in minions)
-            {
-              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
-                {
-                  _q2.CastOnUnit(minion);
-                }
-            }
-        }
-    }
-  /*if (qex && qexc && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
-    {
-      var manahh = _config.Item("manah").GetValue<Slider>().Value;
-      var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-      var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
-        {
-          foreach (var minion in minions)
-            {
-              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
-                {
-                  _q2.CastOnUnit(minion);
-                }
-            }
-        }
-    }*/
-  if (qnor && autoqnor && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
-    {
-      var manahh = _config.Item("manah").GetValue<Slider>().Value;
-      var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
       if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
         {
           _q.CastOnUnit(t);
         }
     }
-  if (!aqex && qex)
+  if (qharassmode == 0 && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
     {
-      if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
         {
-          var manahh = _config.Item("manah").GetValue<Slider>().Value;
-          var t = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-          var targetqe = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q2.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-          var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, _q.Range, MinionTypes.All, MinionTeam.NotAlly);
-          if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+          _q.CastOnUnit(t);
+        }
+    }
+  if (qexharassmode == 1 && !(_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo))
+    {
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+        {
+          foreach (var minion in minions)
             {
-              foreach (var minion in minions)
+              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
                 {
-                  if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
-                    {
-                      _q2.CastOnUnit(minion);
-                    }
+                  _q2.CastOnUnit(minion);
                 }
             }
-          if (qnor)
+        }
+    }
+  if (qexharassmode == 0 && (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || _orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
+    {
+      if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh && _q.IsReady() && targetqe.Distance(ObjectManager.Player.Position) > _q.Range && targetqe.CountEnemiesInRange(_q2.Range) > 0)
+        {
+          foreach (var minion in minions)
             {
-              var tq = HeroManager.Enemies.Where(hero => hero.IsValidTarget(_q.Range)).FirstOrDefault(hero => _config.Item("auto" + hero.ChampionName).GetValue<bool>());
-              if ((ObjectManager.Player.Mana/ObjectManager.Player.MaxMana)*100 > manahh)
+              if (_q2.WillHit(targetqe, ObjectManager.Player.ServerPosition.Extend(minion.ServerPosition, _q2.Range), 0, HitChance.VeryHigh))
                 {
-                  _q.CastOnUnit(tq);
+                  _q2.CastOnUnit(minion);
                 }
             }
         }
     }
   eswitch();
-  SwitchOptionSEX();
-  SwitchOptionsnq();
-  SwitchOptionseqc();
-  SwitchOptionsdas();
 }
 #endregion
-
-
-
 #region Q
 private static void CastQ()
 {
@@ -260,9 +207,6 @@ private static void CastQ()
   Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
 }
 #endregion
-
-
-
 #region Qbef
 private static void CastQbef()
 {
@@ -274,9 +218,6 @@ private static void CastQbef()
       }
 }
 #endregion
-
-
-
 #region W
 private static void CastW()
 {
@@ -288,9 +229,6 @@ private static void CastW()
       }
 }
 #endregion
-
-
-
 #region draw
 private static void OnDraw(EventArgs args)
 {
@@ -440,56 +378,6 @@ private static void OnDraw(EventArgs args)
   }
 }
 #endregion
-
-
-
-#region switchoptionSEX
-private static void SwitchOptionSEX()
-  {
-    if (!(_config.Item("qe").GetValue<bool>()))
-      {
-        _config.Item("aqe").SetValue(false);
-      }
-  }
-#endregion
-
-
-
-#region switchoptionsnq
-private static void SwitchOptionsnq()
-  {
-    if (!(_config.Item("qn").GetValue<bool>()))
-      {
-        _config.Item("aqn").SetValue(false);
-      }
-  }
-#endregion
-
-
-
-#region switchoptionseqc
-private static void SwitchOptionseqc()
-  {
-    if (_config.Item("e").GetValue<bool>())
-      {
-        _config.Item("qcaa").SetValue(false);
-      }
-  }
-#endregion
-
-
-
-#region switchoptionsdas
-private static void SwitchOptionsdas()
-  {
-    if (_config.Item("qcaaa").GetValue<bool>())
-      {
-        _config.Item("qcaa").SetValue(false);
-        _config.Item("e").SetValue(false);
-      }
-  }
-#endregion
-
 #region eswitch
 private static void eswitch()
 {
