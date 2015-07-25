@@ -136,7 +136,7 @@ private static void Emodeaa()
                 }
               else if (_q.IsReady())
                 {
-                  Utility.DelayAction.Add(450, CastQ);
+                  Utility.DelayAction.Add(350, CastQ);
                 }
               else if (_w.IsReady())
                 {
@@ -156,7 +156,7 @@ private static void Emodeoff()
             {
               if (_q.IsReady())
                 {
-                  Utility.DelayAction.Add(450, CastQ);
+                  Utility.DelayAction.Add(350, CastQ);
                 }
               else if (_w.IsReady())
                 {
