@@ -135,10 +135,6 @@ private static void Emodeaa()
                     {
                       _e.Cast(Game.CursorPos);
                     }
-                  else if (emod == 2)
-                    {
-                      _e.Cast(tt.ServerPosition);
-                    }
                 }
               else if (_q.IsReady())
                 {
@@ -233,7 +229,7 @@ private static void menu()
       _config.SubMenu("Combo").SubMenu("Q settings").AddItem(new MenuItem("qsetba", "if enemy %hp then use Q before attack").SetValue(new Slider(30, 60, 0)));
       _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
       _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-      _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"})));
+      _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse"})));
       _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
       foreach (var hero in HeroManager.Enemies)
         {
@@ -304,15 +300,11 @@ private static void eswitch()
   switch (emode)
     {
       case 0:
-        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"}, 1));
+        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse"}, 1));
         _lastTick = Environment.TickCount + 300;
       break;
       case 1:
-        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"}, 2));
-        _lastTick = Environment.TickCount + 300;
-      break;
-      case 2:
-        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse", "To target"}));
+        _config.Item("emod").SetValue(new StringList(new[]{"Safe", "To mouse"}));
         _lastTick = Environment.TickCount + 300;
       break;
     }
@@ -334,13 +326,10 @@ private static void emodedrawtext()
         switch (emp)
           {
             case 0:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "Safe");
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "S A F E");
             break;
             case 1:
               Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To mouse");
-            break;
-            case 2:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To target");
             break;
           }
       }
