@@ -294,6 +294,27 @@ private static void CastW()
 #region draw
 private static void OnDraw(EventArgs args)
 {
+  {
+    var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
+    var emp = _config.Item("emod").GetValue<StringList>().SelectedIndex;
+    var empd = _config.Item("empd").GetValue<bool>();
+    if (empd)
+      {
+        switch (emp)
+          {
+            case 0:
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "Safe");
+            break;
+            case 1:
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To mouse");
+            break;
+            case 2:
+              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To target");
+            break;
+          }
+      }
+  }
+  
   var srdy = _config.Item("srdy").GetValue<bool>();
   {
     var qndt = _config.Item("qndt").GetValue<Slider>().Value;
@@ -414,27 +435,6 @@ private static void OnDraw(EventArgs args)
         if (_q2.IsReady())
           {
             Render.Circle.DrawCircle(ObjectManager.Player.Position, _q2.Range, qed.Color, qedt);
-          }
-      }
-  }
-  
-  {
-    var wts = Drawing.WorldToScreen(ObjectManager.Player.Position);
-    var emp = _config.Item("emod").GetValue<StringList>().SelectedIndex;
-    var empd = _config.Item("empd").GetValue<bool>();
-    if (empd)
-      {
-        switch (emp)
-          {
-            case 0:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "Safe");
-            break;
-            case 1:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To mouse");
-            break;
-            case 2:
-              Drawing.DrawText(wts[0] - 30, wts[1], Color.White, "To target");
-            break;
           }
       }
   }
