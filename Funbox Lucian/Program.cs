@@ -28,8 +28,8 @@ private static void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit t
 {
   if (_orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
     {
-      Emodeoff();
-      Emodeaa();
+      if (!_config.Item("e").GetValue<bool>()) {Emodeoff();}
+      if (_config.Item("e").GetValue<bool>()) {Emodeaa();}
     }
 }
 private static void OnDraw(EventArgs args)
@@ -114,67 +114,59 @@ private static void CastQkillsteal()
 private static void Emodeaa()
 {
   var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
-  var ec = _config.Item("e").GetValue<bool>();
   var emod = _config.Item("emod").GetValue<StringList>().SelectedIndex;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
     {
-          if (ec)
+      if (_e.IsReady())
+        {
+          if (emod == 0)
             {
-              if (_e.IsReady())
+              var pos = Geometry.CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), Prediction.GetPrediction(tt, 0.25f).UnitPosition.To2D(), _e.Range, Orbwalking.GetRealAutoAttackRange(tt));
+              if (pos.Count() > 0)
                 {
-                  if (emod == 0)
-                    {
-                      var pos = Geometry.CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), Prediction.GetPrediction(tt, 0.25f).UnitPosition.To2D(), _e.Range, Orbwalking.GetRealAutoAttackRange(tt));
-                      if (pos.Count() > 0)
-                        {
-                          _e.Cast(pos.MinOrDefault(i => i.Distance(Game.CursorPos)));
-                        }
-                      else
-                        {
-                          _e.Cast(ObjectManager.Player.ServerPosition.Extend(tt.ServerPosition, -_e.Range));
-                        }
-                    }
-                  else if (emod == 1)
-                    {
-                      _e.Cast(Game.CursorPos);
-                    }
+                  _e.Cast(pos.MinOrDefault(i => i.Distance(Game.CursorPos)));
                 }
-              else if (_q.IsReady())
+              else
                 {
-                  if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
-                    {
-                      Utility.DelayAction.Add(350, CastQ);
-                    }
-                }
-              else if (_w.IsReady())
-                {
-                  Utility.DelayAction.Add(450, CastW);
+                  _e.Cast(ObjectManager.Player.ServerPosition.Extend(tt.ServerPosition, -_e.Range));
                 }
             }
+          else if (emod == 1)
+            {
+              _e.Cast(Game.CursorPos);
+            }
+        }
+      else if (_q.IsReady())
+        {
+          if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
+            {
+              Utility.DelayAction.Add(350, CastQ);
+            }
+        }
+      else if (_w.IsReady())
+        {
+          Utility.DelayAction.Add(450, CastW);
         }
     }
+}
 private static void Emodeoff()
 {
   var enemyhp = _config.Item("qsetba").GetValue<Slider>().Value;
   var tt = TargetSelector.GetTarget(_q.Range, TargetSelector.DamageType.Physical);
-  var ec = _config.Item("e").GetValue<bool>();
     {
-          if (!ec)
+      if (_q.IsReady())
+        {
+          if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
             {
-              if (_q.IsReady())
-                {
-                  if (((tt.Health/tt.MaxHealth)*100 > enemyhp))
-                    {
-                      Utility.DelayAction.Add(350, CastQ);
-                    }
-                }
-              else if (_w.IsReady())
-                {
-                  Utility.DelayAction.Add(450, CastW);
-                }
+              Utility.DelayAction.Add(350, CastQ);
             }
         }
+      else if (_w.IsReady())
+        {
+          Utility.DelayAction.Add(450, CastW);
+        }
     }
+}
 
 
 
