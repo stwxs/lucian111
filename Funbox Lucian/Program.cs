@@ -240,7 +240,7 @@ private static void menu()
   var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
   TargetSelector.AddToMenu(targetSelectorMenu);
   _config.AddSubMenu(targetSelectorMenu);
-  _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(false));
+  _config.SubMenu("Combo").AddItem(new MenuItem("e", "E combo").SetValue(true));
   _config.SubMenu("Combo").AddItem(new MenuItem("eswitch", "E mode switch Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
   _config.SubMenu("Combo").AddItem(new MenuItem("emod", "E mode").SetValue(new StringList(new[]{"Safe", "To mouse"})));
   _config.SubMenu("Harass").AddItem(new MenuItem("info1", "ON:"));
